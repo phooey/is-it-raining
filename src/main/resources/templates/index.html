@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en-US"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
 <title th:text="${appName}"></title>
 <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
@@ -8,7 +10,7 @@
 <script>
 function showError(message) {
   document.getElementById("error").style.visibility = "visible";
-  document.getElementById("error").innerHTML = message;  
+  document.getElementById("error").innerHTML = message;
 }
 
 function convertToPercentString(chanceOfRain) {
@@ -25,7 +27,7 @@ function retrieveRainReport(position) {
   xhr.open('GET', 'isitraining/?latitude=' + latitude + '&longitude=' + longitude);
   xhr.timeout = 5000;
   xhr.onerror = function (e) {
-	showError("Could not reach service: Error");  
+	showError("Could not reach service: Error");
   }
   xhr.ontimeout = function (e) {
 	showError("Could not reach service: Timeout");
@@ -50,7 +52,7 @@ function getLocation() {
     navigator.geolocation.getCurrentPosition(retrieveRainReport, function (error) {
     	showError("You need to share your location for this page to work.");
     });
-  } else { 
+  } else {
 	showError("This page will not function without GeoLocation support.");
   }
 }
