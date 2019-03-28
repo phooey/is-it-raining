@@ -1,0 +1,2 @@
+# Insert your Dark Sky API key here, and rename the file to "darksky.apikey.properties"
+darksky.api.key=inserthere
