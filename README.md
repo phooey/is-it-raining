@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/phooey/is-it-raining.svg?branch=master)](https://travis-ci.org/phooey/is-it-raining)
 # Is it raining?
 
 ## The test pyramid
