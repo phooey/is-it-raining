@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/phooey/is-it-raining.svg?branch=master)](https://travis-ci.org/phooey/is-it-raining)
 # Is it raining?
+[![Build Status](https://travis-ci.org/phooey/is-it-raining.svg?branch=master)](https://travis-ci.org/phooey/is-it-raining)
 
 ## The test pyramid
 After reading some very interesting articles on how to efficiently work with test automation, specifically about the so called ["Test Pyramid"](https://martinfowler.com/bliki/TestPyramid.html), I wanted to try the techniques out myself in a practical example project.
