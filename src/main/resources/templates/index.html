@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="en-US"
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+﻿<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
 <title th:text="${appName}"></title>
-<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
-<meta charset="ISO-8859-1">
-</head>
-<script>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<script type="text/javascript">
 function showError(message) {
   document.getElementById("error").style.visibility = "visible";
   document.getElementById("error").innerHTML = message;
@@ -79,7 +75,7 @@ body {
 </head>
 <body>
 <h1><span id="title" th:text="${appName}"></span></h1>
-<span id="error" class="error"></span>
+<span id="error"></span>
 <table id="rainReport">
   <tr>
     <td><h1><b><span id="rainingCurrently"></span></b></h1></td>
