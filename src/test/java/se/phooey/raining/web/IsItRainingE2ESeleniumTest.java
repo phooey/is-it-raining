@@ -65,8 +65,9 @@ public class IsItRainingE2ESeleniumTest {
 		profile.setPreference("webdriver_enable_native_events", false);
 		profile.setPreference("geo.prompt.testing", true);
 		profile.setPreference("geo.prompt.testing.allow", true);
-		URL fileUrl = getClass().getClassLoader().getResource("spoofed_geolocation.json");
-		profile.setPreference("geo.wifi.uri", Objects.requireNonNull(fileUrl, "fileUrl is null").toExternalForm());
+		final String fileName = "spoofed_geolocation.json";
+		URL fileUrl = getClass().getClassLoader().getResource(fileName);
+		profile.setPreference("geo.wifi.uri", Objects.requireNonNull(fileUrl, String.format("Cannot find file %s", fileName)).toExternalForm());
 		options.setProfile(profile);
 		options.setHeadless(true);
 		driver = new FirefoxDriver(options);
