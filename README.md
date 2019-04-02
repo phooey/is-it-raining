@@ -54,7 +54,7 @@ The first test then spoofs an HTML5 Geolocation response and request a rain repo
 The second test makes sure that an attribution link for the Dark Sky API is displayed on the page, in accordance with the [Terms of Service](https://darksky.net/dev/docs/terms) for the Dark Sky API.
 
 ## Building and running the application:
-First get your own API Key from [Dark Sky](https://darksky.net/dev), then paste your key into the file "src/main/resources/darksky.apikey.properties" and rename the file to "darksky.apikey.properties".
+First get your own API Key from [Dark Sky](https://darksky.net/dev), then paste your key into the file "src/main/resources/darksky.apikey.properties.example" and rename the file to "darksky.apikey.properties".
 
 To run the tests execute the following command:
 `mvn test`
