@@ -81,36 +81,36 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 		}
 	}
 
-	private Precipitation isThereRainInCurrentForecast(Optional<Currently> currentForecast) {
+	private void populateFromCurrently(Optional<Currently> currentForecast, RainReport report) {
 		Currently currently;
 		if (currentForecast.isPresent()) {
 			currently = currentForecast.get();
 		} else {
-			return Precipitation.UNKNOWN;
+			return;
 		}
 		String precipType = Optional.ofNullable(currently.getPrecipType()).orElse("");
 		if (precipType.equals("rain")) {
-			return Precipitation.RAIN;
+			report.setCurrentPrecipitation(Precipitation.RAIN.toString());
 		} else {
-			return Precipitation.NONE;
+			report.setCurrentPrecipitation(Precipitation.NONE.toString());
 		}
 	}
 
-	private double getChanceOfRainToday(Optional<Daily> dailyForecast) {
+	private void populateFromDaily(Optional<Daily> dailyForecast, RainReport report) {
 		if (!dailyForecast.isPresent()) {
-			return -1;
+			return;
 		}
 		Daily daily = dailyForecast.get();
 		List<DailyDataPoint> dailyData = daily.getData();
 		if (dailyData.isEmpty()) {
-			return -1;
+			return;
 		}
 		DailyDataPoint today = dailyData.get(0);
 		String precipType = Optional.ofNullable(today.getPrecipType()).orElse("");
 		if (precipType.equals("rain")) {
-			return today.getPrecipProbability();
+			report.setChanceOfPrecipitationToday(today.getPrecipProbability());
 		} else {
-			return 0;
+			report.setChanceOfPrecipitationToday(0);
 		}
 	}
 
@@ -145,10 +145,12 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 			if (forecast == null) {
 				throw new ForecastException("Forecast is null");
 			}
-			Precipitation rainingCurrently = isThereRainInCurrentForecast(Optional.ofNullable(forecast.getCurrently()));
-			double chanceOfRainToday = getChanceOfRainToday(Optional.ofNullable(forecast.getDaily()));
-			return new RainReport(latitude, longitude, rainingCurrently.toString(), -1, -1, chanceOfRainToday,
-					Precipitation.UNKNOWN.toString());
+			RainReport result = new RainReport();
+			result.setLatitude(latitude);
+			result.setLongitude(longitude);
+			populateFromCurrently(Optional.ofNullable(forecast.getCurrently()), result);
+			populateFromDaily(Optional.ofNullable(forecast.getDaily()), result);
+			return result;
 		} catch (IllegalArgumentException | ForecastException e) {
 			logger.error(e.getMessage());
 			throw new RainReportException(String.format(Locale.US,
