@@ -27,7 +27,6 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import se.phooey.raining.utils.TestUtils;
-import se.phooey.raining.weather.Precipitation;
 
 /**
  * Full-Stack End-to-End tests using Selenium to make sure that the front-end of
