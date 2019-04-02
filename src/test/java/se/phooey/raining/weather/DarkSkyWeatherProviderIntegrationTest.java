@@ -43,8 +43,8 @@ public class DarkSkyWeatherProviderIntegrationTest {
 
 		assertThat(result.getLatitude()).isEqualTo(latitude);
 		assertThat(result.getLongitude()).isEqualTo(longitude);
-		assertThat(result.getRainingCurrently()).isEqualTo(IsItRaining.NO.toString());
-		assertThat(result.getChanceOfRainToday()).isEqualTo(0);
+		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.NONE.toString());
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(0);
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class DarkSkyWeatherProviderIntegrationTest {
 
 		assertThat(result.getLatitude()).isEqualTo(latitude);
 		assertThat(result.getLongitude()).isEqualTo(longitude);
-		assertThat(result.getRainingCurrently()).isEqualTo(IsItRaining.YES.toString());
-		assertThat(result.getChanceOfRainToday()).isEqualTo(1);
+		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.RAIN.toString());
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(1);
 	}
 }

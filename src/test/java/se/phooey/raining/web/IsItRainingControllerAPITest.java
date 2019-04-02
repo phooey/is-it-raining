@@ -15,7 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import se.phooey.raining.weather.IsItRaining;
+import se.phooey.raining.weather.Precipitation;
 import se.phooey.raining.weather.RainReport;
 import se.phooey.raining.weather.WeatherProvider;
 import se.phooey.raining.weather.exception.RainReportException;
@@ -69,7 +69,12 @@ public class IsItRainingControllerAPITest {
 
 	@Test
 	public void whenGetIsItRainingWithValidParams_shouldReturnARainReportForTheLocation() throws Exception {
-		RainReport rainReport = new RainReport(DUMMY_LATITUDE, DUMMY_LONGITUDE, IsItRaining.YES.toString(), 0.5);
+		RainReport rainReport = new RainReport();
+		rainReport.setLatitude(DUMMY_LATITUDE);
+		rainReport.setLongitude(DUMMY_LONGITUDE);
+		rainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
+		rainReport.setChanceOfPrecipitationToday(0.5);
+		
 		given(weatherProviderMock.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE)).willReturn(rainReport);
 
 		this.mockMvc.perform(
@@ -79,8 +84,8 @@ public class IsItRainingControllerAPITest {
 				.andDo(print()).andExpect(status().is2xxSuccessful())
 				.andExpect(jsonPath("$.latitude").value(DUMMY_LATITUDE))
 				.andExpect(jsonPath("$.longitude").value(DUMMY_LONGITUDE))
-				.andExpect(jsonPath("$.rainingCurrently").value(IsItRaining.YES.toString()))
-				.andExpect(jsonPath("$.chanceOfRainToday").value(0.5));
+				.andExpect(jsonPath("$.currentPrecipitation").value(Precipitation.RAIN.toString()))
+				.andExpect(jsonPath("$.chanceOfPrecipitationToday").value(0.5));
 	}
 
 }

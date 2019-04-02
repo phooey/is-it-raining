@@ -14,7 +14,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import io.restassured.http.ContentType;
 import se.phooey.raining.utils.TestUtils;
-import se.phooey.raining.weather.IsItRaining;
+import se.phooey.raining.weather.Precipitation;
 
 /**
  * End-To-End test making sure a real HTTP GET request to the route
@@ -52,7 +52,7 @@ public class IsItRainingE2ERestTest {
 		.contentType(ContentType.JSON).and()
 		.body("latitude", equalTo((float) latitude)).and()
 		.body("longitude", equalTo((float) longitude)).and()
-		.body("rainingCurrently", equalTo(IsItRaining.YES.toString())).and()
-		.body("chanceOfRainToday", equalTo((float) 1));
+		.body("currentPrecipitation", equalTo(Precipitation.RAIN.toString())).and()
+		.body("chanceOfPrecipitationToday", equalTo((float) 1));
 	}
 }

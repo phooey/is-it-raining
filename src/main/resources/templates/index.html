@@ -9,6 +9,20 @@ function showError(message) {
   document.getElementById("error").innerHTML = message;
 }
 
+function formatAnswer(currentPrecipitation) {
+	if (currentPrecipitation == "rain") {
+		return "Yes";
+	} else if (currentPrecipitation == "sleet") {
+		return "Yes (sleet)";
+	} else if (currentPrecipitation == "snow") {
+		return "Yes (snow)";
+	} else if (currentPrecipitation == "none") {
+		return "No";
+	} else {
+		return "Unknown";
+	}
+}
+
 function convertToPercentString(chanceOfRain) {
 	if (chanceOfRain === -1) {
 		return "unknown";
@@ -34,8 +48,8 @@ function retrieveRainReport(position) {
       document.getElementById("rainReport").style.visibility = "visible";
       document.getElementById("latitude").innerHTML = response.latitude;
       document.getElementById("longitude").innerHTML = response.longitude;
-      document.getElementById("rainingCurrently").innerHTML = response.rainingCurrently;
-      document.getElementById("chanceOfRain").innerHTML = convertToPercentString(response.chanceOfRainToday);
+      document.getElementById("rainingCurrently").innerHTML = formatAnswer(response.currentPrecipitation);
+      document.getElementById("chanceOfRain").innerHTML = convertToPercentString(response.chanceOfPrecipitationToday);
     } else {
       showError("Could not retrieve a rain report, try again later.");
     }

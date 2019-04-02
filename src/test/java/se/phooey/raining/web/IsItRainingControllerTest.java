@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import se.phooey.raining.weather.IsItRaining;
+import se.phooey.raining.weather.Precipitation;
 import se.phooey.raining.weather.RainReport;
 import se.phooey.raining.weather.WeatherProvider;
 import se.phooey.raining.weather.exception.RainReportException;
@@ -71,16 +71,17 @@ public class IsItRainingControllerTest {
 		final double requestedLongitude = 10.12345;
 		final double truncatedLongitude = 10.123;
 
-		final String raining = IsItRaining.YES.toString();
-		final double rainingCurrently = 1;
-
-		RainReport dummyReport = new RainReport(truncatedLatitude, truncatedLongitude, raining, rainingCurrently);
+		RainReport dummyRainReport = new RainReport();
+		dummyRainReport.setLatitude(truncatedLatitude);
+		dummyRainReport.setLongitude(truncatedLongitude);
+		dummyRainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
+		dummyRainReport.setChanceOfPrecipitationToday(0.5);
 		given(mockWeatherProvider.isItRainingAtCoordinates(truncatedLatitude, truncatedLongitude))
-				.willReturn(dummyReport);
+				.willReturn(dummyRainReport);
 
 		RainReport result = subject.isItRaining(requestedLatitude, requestedLongitude);
 
-		assertThat(result).isEqualTo(dummyReport);
+		assertThat(result).isEqualTo(dummyRainReport);
 	}
 
 }

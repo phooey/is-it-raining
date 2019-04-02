@@ -81,18 +81,18 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 		}
 	}
 
-	private IsItRaining isThereRainInCurrentForecast(Optional<Currently> currentForecast) {
+	private Precipitation isThereRainInCurrentForecast(Optional<Currently> currentForecast) {
 		Currently currently;
 		if (currentForecast.isPresent()) {
 			currently = currentForecast.get();
 		} else {
-			return IsItRaining.UNKNOWN;
+			return Precipitation.UNKNOWN;
 		}
 		String precipType = Optional.ofNullable(currently.getPrecipType()).orElse("");
 		if (precipType.equals("rain")) {
-			return IsItRaining.YES;
+			return Precipitation.RAIN;
 		} else {
-			return IsItRaining.NO;
+			return Precipitation.NONE;
 		}
 	}
 
@@ -116,10 +116,12 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 
 	/**
 	 * Creates a new DarkSkyWeatherProvider
+	 * 
 	 * @param apiKey the API key to use when making requests to the Dark Sky API
 	 * @param apiUrl the URL to use when making Dark Sky API requests
 	 * @param client The DarkSkyJacksonClient to use to make Dark Sky API requests
-	 * @param clock A Clock to use to determine the time when counting API calls made in a day
+	 * @param clock  A Clock to use to determine the time when counting API calls
+	 *               made in a day
 	 */
 	@Autowired
 	public DarkSkyWeatherProvider(APIKey apiKey, String apiUrl, DarkSkyJacksonClient client, Clock clock) {
@@ -143,9 +145,10 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 			if (forecast == null) {
 				throw new ForecastException("Forecast is null");
 			}
-			IsItRaining rainingCurrently = isThereRainInCurrentForecast(Optional.ofNullable(forecast.getCurrently()));
+			Precipitation rainingCurrently = isThereRainInCurrentForecast(Optional.ofNullable(forecast.getCurrently()));
 			double chanceOfRainToday = getChanceOfRainToday(Optional.ofNullable(forecast.getDaily()));
-			return new RainReport(latitude, longitude, rainingCurrently.toString(), chanceOfRainToday);
+			return new RainReport(latitude, longitude, rainingCurrently.toString(), -1, -1, chanceOfRainToday,
+					Precipitation.UNKNOWN.toString());
 		} catch (IllegalArgumentException | ForecastException e) {
 			logger.error(e.getMessage());
 			throw new RainReportException(String.format(Locale.US,

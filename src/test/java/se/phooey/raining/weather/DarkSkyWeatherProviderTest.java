@@ -100,7 +100,7 @@ public class DarkSkyWeatherProviderTest {
 		when(mockClient.forecast(any())).thenReturn(mockForecast);
 
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
-		assertThat(result.getRainingCurrently()).isEqualTo(IsItRaining.UNKNOWN.toString());
+		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.UNKNOWN.toString());
 	}
 
 	@Test
@@ -110,7 +110,7 @@ public class DarkSkyWeatherProviderTest {
 		when(mockClient.forecast(any())).thenReturn(mockForecast);
 
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
-		assertThat(result.getRainingCurrently()).isEqualTo(IsItRaining.NO.toString());
+		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.NONE.toString());
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class DarkSkyWeatherProviderTest {
 		when(mockClient.forecast(any())).thenReturn(mockForecast);
 
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
-		assertThat(result.getRainingCurrently()).isEqualTo(IsItRaining.YES.toString());
+		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.RAIN.toString());
 	}
 
 	@Test
@@ -129,7 +129,7 @@ public class DarkSkyWeatherProviderTest {
 		when(mockForecast.getDaily()).thenReturn(null);
 
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
-		assertThat(result.getChanceOfRainToday()).isEqualTo(-1);
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(-1);
 	}
 
 	@Test
@@ -140,7 +140,7 @@ public class DarkSkyWeatherProviderTest {
 		when(mockDaily.getData()).thenReturn(emptyDailyData);
 
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
-		assertThat(result.getChanceOfRainToday()).isEqualTo(-1);
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(-1);
 	}
 
 	@Test
@@ -152,7 +152,7 @@ public class DarkSkyWeatherProviderTest {
 		when(mockDaily.getData()).thenReturn(dailyData);
 
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
-		assertThat(result.getChanceOfRainToday()).isEqualTo(0);
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(0);
 	}
 
 	@Test
@@ -167,14 +167,18 @@ public class DarkSkyWeatherProviderTest {
 
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
 		assertThat(result.getLatitude()).isEqualTo(DUMMY_LATITUDE);
-		assertThat(result.getChanceOfRainToday()).isEqualTo(0.5);
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(0.5);
 	}
 
 	@Test
 	public void whenThereAreMoreThan1000ApiCallsInADay_thenItShouldNotMakeADarkSkyApiCallAndThrowARainReportException()
 			throws Exception {
 		mockForecast(true, 0.5);
-		RainReport dummyRainReport = new RainReport(DUMMY_LATITUDE, DUMMY_LONGITUDE, IsItRaining.YES.toString(), 0.5);
+		RainReport dummyRainReport = new RainReport();
+		dummyRainReport.setLatitude(DUMMY_LATITUDE);
+		dummyRainReport.setLongitude(DUMMY_LONGITUDE);
+		dummyRainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
+		dummyRainReport.setChanceOfPrecipitationToday(0.5);
 
 		for (int i = 1; i <= 999; i++) {
 			RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
@@ -194,6 +198,7 @@ public class DarkSkyWeatherProviderTest {
 	@Test
 	public void whenThereAreMoreThan1000ApiCallsInADay_thenItShouldStartMakingNewCallsTheNextDay() throws Exception {
 		when(mockClient.forecast(any())).thenReturn(mockForecast);
+		
 
 		// Make 1100 requests
 		IntStream.range(0, 1100).forEachOrdered(n -> {
@@ -218,11 +223,16 @@ public class DarkSkyWeatherProviderTest {
 		// Return tomorrows date to reset the API call counter and make sure we then
 		// make new requests again
 		mockForecast(true, 0.5);
+		RainReport dummyRainReport = new RainReport();
+		dummyRainReport.setLatitude(DUMMY_LATITUDE);
+		dummyRainReport.setLongitude(DUMMY_LONGITUDE);
+		dummyRainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
+		dummyRainReport.setChanceOfPrecipitationToday(0.5);
+		
 		when(mockClock.millis()).thenReturn(Clock.systemUTC().millis() + DateUtils.MILLIS_PER_DAY);
 
-		RainReport expected = new RainReport(DUMMY_LATITUDE, DUMMY_LONGITUDE, IsItRaining.YES.toString(), 0.5);
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
 		verify(mockClient, times(1)).forecast(any());
-		assertThat(result).isEqualTo(expected);
+		assertThat(result).isEqualTo(dummyRainReport);
 	}
 }
