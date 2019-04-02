@@ -74,6 +74,12 @@ Please note that for HTML5 geolocation to work in some browsers (e.g. Chrome 50.
 An example script "start_container.sh" is provided to show how this could be done, starting a docker container and connecting it to a network called "letsencrypt_default" where a reverse proxy is set up to forward the calls the docker container, encrypting the external communication. To set up a reverse proxy like this, take a look at [linuxserver/letsencrypt
 ](https://hub.docker.com/r/linuxserver/letsencrypt/).
 
+## Continuous Integration
+There is a simple .travisyml file in the project, and the code is automatically built, and all tests executed by [Travis](https://travis-ci.com) on all new commits and pull requests, as the service is very generously freely provided to all public open source GitHub projects.
+
+The build results are displayed with the build status image at the top of this README, and can also be viewed on the following page:
+https://travis-ci.org/phooey/is-it-raining
+
 ## Links:
 * https://martinfowler.com/bliki/TestPyramid.html
 * https://martinfowler.com/articles/practical-test-pyramid.html
@@ -86,6 +92,7 @@ An example script "start_container.sh" is provided to show how this could be don
 * https://git-scm.com/
 * https://github.com/
 * https://www.eclipse.org/egit/
+* https://travis-ci.com
 
 ## Third party software used in the application:
 * https://spring.io/projects/spring-boot
