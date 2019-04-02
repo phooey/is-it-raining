@@ -81,6 +81,7 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 		}
 	}
 
+	// TODO: Align the duplicated code in the following two methods and make them more readable
 	private void populateFromCurrently(Optional<Currently> currentForecast, RainReport report) {
 		Currently currently;
 		if (currentForecast.isPresent()) {
@@ -88,11 +89,37 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 		} else {
 			return;
 		}
-		String precipType = Optional.ofNullable(currently.getPrecipType()).orElse("");
-		if (precipType.equals("rain")) {
-			report.setCurrentPrecipitation(Precipitation.RAIN.toString());
+		Optional<Double> precipProbability = Optional.ofNullable(currently.getPrecipProbability());
+		if (precipProbability.isPresent()) {
+			report.setCurrentAccuracy(precipProbability.get());
+			if (precipProbability.get() == 0.0) {
+				report.setCurrentIntensity(0.0);
+				report.setCurrentPrecipitation(Precipitation.NONE.toString());
+				return;
+			}
 		} else {
-			report.setCurrentPrecipitation(Precipitation.NONE.toString());
+			// If there is no precipProbability, precipType or precipIntensity will also not be set
+			return;
+		}
+		Optional<Double> precipIntensity = Optional.ofNullable(currently.getPrecipIntensity());
+		if (precipIntensity.isPresent()) {
+			// TODO: Convert to millimeters
+			report.setCurrentIntensity(precipIntensity.get());
+		} else {
+			// If there is no precipIntensity, precipType will not be set
+			return;
+		}
+		Optional<String> precipType = Optional.ofNullable(currently.getPrecipType());
+		if (!precipType.isPresent()) {
+			return;
+		}
+		String type = precipType.get();
+		if ("rain".equals(type)) {
+			report.setCurrentPrecipitation(Precipitation.RAIN.toString());
+		} else if ("sleet".equals(type)) {
+			report.setCurrentPrecipitation(Precipitation.SLEET.toString());
+		} else if ("snow".equals(type)) {
+			report.setCurrentPrecipitation(Precipitation.SNOW.toString());
 		}
 	}
 
@@ -105,12 +132,29 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 		if (dailyData.isEmpty()) {
 			return;
 		}
-		DailyDataPoint today = dailyData.get(0);
-		String precipType = Optional.ofNullable(today.getPrecipType()).orElse("");
-		if (precipType.equals("rain")) {
-			report.setChanceOfPrecipitationToday(today.getPrecipProbability());
+		DailyDataPoint today = dailyData.get(0);	
+		Optional<Double> precipProbability = Optional.ofNullable(today.getPrecipProbability());
+		if (precipProbability.isPresent()) {
+			report.setChanceOfPrecipitationToday(precipProbability.get());
+			if (precipProbability.get() == 0.0) {
+				report.setTypeOfPrecipitationToday(Precipitation.NONE.toString());
+				return;
+			}
 		} else {
-			report.setChanceOfPrecipitationToday(0);
+			// If there is no precipProbability, precipType will also not be set
+			return;
+		}
+		Optional<String> precipType = Optional.ofNullable(today.getPrecipType());
+		if (!precipType.isPresent()) {
+			return;
+		}
+		String type = precipType.get();
+		if ("rain".equals(type)) {
+			report.setTypeOfPrecipitationToday(Precipitation.RAIN.toString());
+		} else if ("sleet".equals(type)) {
+			report.setTypeOfPrecipitationToday(Precipitation.SLEET.toString());
+		} else if ("snow".equals(type)) {
+			report.setTypeOfPrecipitationToday(Precipitation.SNOW.toString());
 		}
 	}
 

@@ -62,7 +62,7 @@ public class RainReport {
 		this.currentAccuracy = -1;
 		this.currentIntensity = -1;
 		this.chanceOfPrecipitationToday = -1;
-		this.typeOfPrecipitationToday = Precipitation.UNKNOWN.toString();;
+		this.typeOfPrecipitationToday = Precipitation.UNKNOWN.toString();
 	}
 
 	@Override

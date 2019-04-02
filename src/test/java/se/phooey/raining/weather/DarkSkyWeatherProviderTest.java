@@ -61,19 +61,19 @@ public class DarkSkyWeatherProviderTest {
 		when(mockClock.millis()).thenReturn(Clock.systemUTC().millis());
 	}
 
-	// Helper method that mocks a Forecast result with the provided parameters
-	private void mockForecast(boolean rainCurrently, double chanceOfRainToday) throws ForecastException {
+	// Helper method that mocks a Forecast result based on the provided RainReport
+	private void mockForecast(RainReport expected) throws ForecastException {
 		when(mockClient.forecast(any())).thenReturn(mockForecast);
 		when(mockForecast.getCurrently()).thenReturn(mockCurrently);
-		if (rainCurrently) {
-			when(mockCurrently.getPrecipType()).thenReturn("rain");
-			when(mockForecast.getDaily()).thenReturn(mockDaily);
-		}
+		when(mockCurrently.getPrecipProbability()).thenReturn(expected.getCurrentAccuracy());
+		when(mockCurrently.getPrecipIntensity()).thenReturn(expected.getCurrentIntensity());
+		when(mockCurrently.getPrecipType()).thenReturn(expected.getCurrentPrecipitation());
+		when(mockForecast.getDaily()).thenReturn(mockDaily);
 		List<DailyDataPoint> dailyData = new ArrayList<>();
 		dailyData.add(mockDailyDataPoint);
 		when(mockDaily.getData()).thenReturn(dailyData);
-		when(mockDailyDataPoint.getPrecipType()).thenReturn("rain");
-		when(mockDailyDataPoint.getPrecipProbability()).thenReturn(chanceOfRainToday);
+		when(mockDailyDataPoint.getPrecipProbability()).thenReturn(expected.getChanceOfPrecipitationToday());
+		when(mockDailyDataPoint.getPrecipType()).thenReturn(expected.getTypeOfPrecipitationToday());
 	}
 
 	@Test(expected = RainReportException.class)
@@ -84,7 +84,7 @@ public class DarkSkyWeatherProviderTest {
 	}
 
 	@Test
-	public void whenReturnRainReport_thenItShouldIncludeCoordinates() throws Exception {
+	public void whenReturnRainReport_thenItShouldIncludeTheCoordinates() throws Exception {
 		when(mockForecast.getCurrently()).thenReturn(null);
 		when(mockClient.forecast(any())).thenReturn(mockForecast);
 
@@ -93,6 +93,7 @@ public class DarkSkyWeatherProviderTest {
 		assertThat(result.getLongitude()).isEqualTo(DUMMY_LONGITUDE);
 	}
 
+	// TODO: Look at code coverage and align these unit tests to not be so similar
 	@Test
 	public void whenNoCurrentlyInForecast_thenCurrentValuesShouldBeUnknownAndMinusOne() throws Exception {
 		when(mockForecast.getCurrently()).thenReturn(null);
@@ -103,25 +104,71 @@ public class DarkSkyWeatherProviderTest {
 		assertThat(result.getCurrentAccuracy()).isEqualTo(-1);
 		assertThat(result.getCurrentIntensity()).isEqualTo(-1);
 	}
+	
+	@Test
+	public void whenNoPrecipitationInformationInCurrently_thenCurrentValuesShouldBeUnknownAndMinusOne() throws Exception {
+		when(mockForecast.getCurrently()).thenReturn(null);
+		when(mockClient.forecast(any())).thenReturn(mockForecast);
+		when(mockCurrently.getPrecipProbability()).thenReturn(null);
+		when(mockCurrently.getPrecipType()).thenReturn(null);
+		when(mockCurrently.getPrecipIntensity()).thenReturn(null);
+
+		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
+		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.UNKNOWN.toString());
+		assertThat(result.getCurrentAccuracy()).isEqualTo(-1);
+		assertThat(result.getCurrentIntensity()).isEqualTo(-1);
+	}
 
 	@Test
-	public void whenNoRainInCurrently_thenCurrentPrecipitationShouldBeNone() throws Exception {
+	public void whenNoPrecipitationInCurrently_thenCurrentPrecipitationShouldBeNone() throws Exception {
 		when(mockForecast.getCurrently()).thenReturn(mockCurrently);
-		when(mockCurrently.getPrecipType()).thenReturn("");
 		when(mockClient.forecast(any())).thenReturn(mockForecast);
+		when(mockCurrently.getPrecipProbability()).thenReturn(0.0);
 
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
 		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.NONE.toString());
 	}
 
 	@Test
-	public void whenRainInCurrently_CurrentPrecipitationShouldBeRain() throws Exception {
+	public void whenRainInCurrently_CurrentPrecipitationShouldBeRainAndChanceAndIntensitySet() throws Exception {
 		when(mockForecast.getCurrently()).thenReturn(mockCurrently);
+		when(mockClient.forecast(any())).thenReturn(mockForecast);		
+		when(mockCurrently.getPrecipProbability()).thenReturn(0.5);
 		when(mockCurrently.getPrecipType()).thenReturn("rain");
-		when(mockClient.forecast(any())).thenReturn(mockForecast);
+		when(mockCurrently.getPrecipIntensity()).thenReturn(2.5);
 
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
 		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.RAIN.toString());
+		assertThat(result.getCurrentAccuracy()).isEqualTo(0.5);
+		assertThat(result.getCurrentIntensity()).isEqualTo(2.5);
+	}
+	
+	@Test
+	public void whenSleetInCurrently_CurrentPrecipitationShouldBeRainAndChanceAndIntensitySet() throws Exception {
+		when(mockForecast.getCurrently()).thenReturn(mockCurrently);
+		when(mockClient.forecast(any())).thenReturn(mockForecast);		
+		when(mockCurrently.getPrecipProbability()).thenReturn(0.5);
+		when(mockCurrently.getPrecipType()).thenReturn("sleet");
+		when(mockCurrently.getPrecipIntensity()).thenReturn(2.5);
+
+		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
+		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.SLEET.toString());
+		assertThat(result.getCurrentAccuracy()).isEqualTo(0.5);
+		assertThat(result.getCurrentIntensity()).isEqualTo(2.5);
+	}
+	
+	@Test
+	public void whenSnowInCurrently_CurrentPrecipitationShouldBeRainAndChanceAndIntensitySet() throws Exception {
+		when(mockForecast.getCurrently()).thenReturn(mockCurrently);
+		when(mockClient.forecast(any())).thenReturn(mockForecast);		
+		when(mockCurrently.getPrecipProbability()).thenReturn(0.5);
+		when(mockCurrently.getPrecipType()).thenReturn("snow");
+		when(mockCurrently.getPrecipIntensity()).thenReturn(2.5);
+
+		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
+		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.SNOW.toString());
+		assertThat(result.getCurrentAccuracy()).isEqualTo(0.5);
+		assertThat(result.getCurrentIntensity()).isEqualTo(2.5);
 	}
 
 	@Test
@@ -147,19 +194,38 @@ public class DarkSkyWeatherProviderTest {
 	}
 
 	@Test
-	public void whenNoRainInDailyDataPointInDaily_thenChanceOfPrecipitationTodayShouldBeZero() throws Exception {
+	public void whenNoPrecipitationInformationInDailyDataPoint_thenChanceShouldBeMinusOneAndTypeUnknown()
+			throws Exception {
 		when(mockClient.forecast(any())).thenReturn(mockForecast);
 		when(mockForecast.getDaily()).thenReturn(mockDaily);
 		List<DailyDataPoint> dailyData = new ArrayList<>();
 		dailyData.add(mockDailyDataPoint);
 		when(mockDaily.getData()).thenReturn(dailyData);
+		when(mockDailyDataPoint.getPrecipProbability()).thenReturn(null);
 
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
-		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(0);
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(-1);
+		assertThat(result.getTypeOfPrecipitationToday()).isEqualTo(Precipitation.UNKNOWN.toString());
+	}
+	
+	@Test
+	public void whenPrecipProbabilityZeroInDailyDataPoint_thenChanceShouldBeZeroAndTypeNone()
+			throws Exception {
+		when(mockClient.forecast(any())).thenReturn(mockForecast);
+		when(mockForecast.getDaily()).thenReturn(mockDaily);
+		List<DailyDataPoint> dailyData = new ArrayList<>();
+		dailyData.add(mockDailyDataPoint);
+		when(mockDaily.getData()).thenReturn(dailyData);
+		when(mockDailyDataPoint.getPrecipProbability()).thenReturn(0.0);
+
+		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
+		assertThat(result.getLatitude()).isEqualTo(DUMMY_LATITUDE);
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(0.0);
+		assertThat(result.getTypeOfPrecipitationToday()).isEqualTo(Precipitation.NONE.toString());
 	}
 
 	@Test
-	public void whenRainInDailyDataPointInDaily_thenChanceOfPrecipitationTodayShouldBePrecipProbability()
+	public void whenRainInDailyDataPoint_thenChanceShouldBePrecipProbabilityAndTypeRain()
 			throws Exception {
 		when(mockClient.forecast(any())).thenReturn(mockForecast);
 		when(mockForecast.getDaily()).thenReturn(mockDaily);
@@ -172,17 +238,54 @@ public class DarkSkyWeatherProviderTest {
 		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
 		assertThat(result.getLatitude()).isEqualTo(DUMMY_LATITUDE);
 		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(0.5);
+		assertThat(result.getTypeOfPrecipitationToday()).isEqualTo(Precipitation.RAIN.toString());
+	}
+	
+	@Test
+	public void whenSleetInDailyDataPoint_thenChanceShouldBePrecipProbabilityAndTypeSleet()
+			throws Exception {
+		when(mockClient.forecast(any())).thenReturn(mockForecast);
+		when(mockForecast.getDaily()).thenReturn(mockDaily);
+		List<DailyDataPoint> dailyData = new ArrayList<>();
+		dailyData.add(mockDailyDataPoint);
+		when(mockDaily.getData()).thenReturn(dailyData);
+		when(mockDailyDataPoint.getPrecipType()).thenReturn("sleet");
+		when(mockDailyDataPoint.getPrecipProbability()).thenReturn(0.5);
+
+		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
+		assertThat(result.getLatitude()).isEqualTo(DUMMY_LATITUDE);
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(0.5);
+		assertThat(result.getTypeOfPrecipitationToday()).isEqualTo(Precipitation.SLEET.toString());
+	}
+	
+	@Test
+	public void whenSnowInDailyDataPoint_thenChanceShouldBePrecipProbabilityAndTypeSnow()
+			throws Exception {
+		when(mockClient.forecast(any())).thenReturn(mockForecast);
+		when(mockForecast.getDaily()).thenReturn(mockDaily);
+		List<DailyDataPoint> dailyData = new ArrayList<>();
+		dailyData.add(mockDailyDataPoint);
+		when(mockDaily.getData()).thenReturn(dailyData);
+		when(mockDailyDataPoint.getPrecipType()).thenReturn("snow");
+		when(mockDailyDataPoint.getPrecipProbability()).thenReturn(0.5);
+
+		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
+		assertThat(result.getLatitude()).isEqualTo(DUMMY_LATITUDE);
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(0.5);
+		assertThat(result.getTypeOfPrecipitationToday()).isEqualTo(Precipitation.SNOW.toString());
 	}
 
 	@Test
 	public void whenThereAreMoreThan1000ApiCallsInADay_thenItShouldNotMakeADarkSkyApiCallAndThrowARainReportException()
 			throws Exception {
-		mockForecast(true, 0.5);
+		// TODO: Remove check of RainReport in this test, check only if exception is thrown
 		RainReport dummyRainReport = new RainReport();
 		dummyRainReport.setLatitude(DUMMY_LATITUDE);
 		dummyRainReport.setLongitude(DUMMY_LONGITUDE);
 		dummyRainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
 		dummyRainReport.setChanceOfPrecipitationToday(0.5);
+
+		mockForecast(dummyRainReport);
 
 		for (int i = 1; i <= 999; i++) {
 			RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
@@ -225,12 +328,14 @@ public class DarkSkyWeatherProviderTest {
 
 		// Return tomorrows date to reset the API call counter and make sure we then
 		// make new requests again
-		mockForecast(true, 0.5);
+		// TODO: Remove check of RainReport in this test, check only if exception is thrown
 		RainReport dummyRainReport = new RainReport();
 		dummyRainReport.setLatitude(DUMMY_LATITUDE);
 		dummyRainReport.setLongitude(DUMMY_LONGITUDE);
 		dummyRainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
 		dummyRainReport.setChanceOfPrecipitationToday(0.5);
+
+		mockForecast(dummyRainReport);
 
 		when(mockClock.millis()).thenReturn(Clock.systemUTC().millis() + DateUtils.MILLIS_PER_DAY);
 

@@ -5,7 +5,7 @@ package se.phooey.raining.weather;
  * and their String representations in English.
  */
 public enum Precipitation {
-	NONE("none"), UNKNOWN("Unknown"), RAIN("rain"), SLEET("sleet"), SNOW("snow");
+	NONE("none"), UNKNOWN("unknown"), RAIN("rain"), SLEET("sleet"), SNOW("snow");
 
 	private final String message;
 
