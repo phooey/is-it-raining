@@ -11,6 +11,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import se.phooey.raining.weather.exception.RainReportException;
 import tk.plogitech.darksky.api.jackson.DarkSkyJacksonClient;
@@ -81,46 +82,42 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 		}
 	}
 
-	// TODO: Align the duplicated code in the following two methods and make them more readable
+	private static Precipitation getPrecipitationForPrecipType(String precipType) {
+		Precipitation result;
+		switch (precipType) {
+		case "rain":
+			result = Precipitation.RAIN;
+			break;
+		case "sleet":
+			result = Precipitation.SLEET;
+			break;
+		case "snow":
+			result = Precipitation.SNOW;
+			break;
+		default:
+			result = Precipitation.UNKNOWN;
+			break;
+		}
+		return result;
+	}
+
 	private void populateFromCurrently(Optional<Currently> currentForecast, RainReport report) {
 		Currently currently;
-		if (currentForecast.isPresent()) {
-			currently = currentForecast.get();
-		} else {
+		if (!currentForecast.isPresent()) {
 			return;
 		}
-		Optional<Double> precipProbability = Optional.ofNullable(currently.getPrecipProbability());
-		if (precipProbability.isPresent()) {
-			report.setCurrentAccuracy(precipProbability.get());
-			if (precipProbability.get() == 0.0) {
-				report.setCurrentIntensity(0.0);
-				report.setCurrentPrecipitation(Precipitation.NONE.toString());
-				return;
-			}
-		} else {
-			// If there is no precipProbability, precipType or precipIntensity will also not be set
+		currently = currentForecast.get();
+		double precipProbability = Optional.ofNullable(currently.getPrecipProbability()).orElse(-1.0);
+		report.setCurrentAccuracy(precipProbability);
+		if (precipProbability == 0.0) {
+			report.setCurrentIntensity(0.0);
+			report.setCurrentPrecipitation(Precipitation.NONE.toString());
 			return;
 		}
-		Optional<Double> precipIntensity = Optional.ofNullable(currently.getPrecipIntensity());
-		if (precipIntensity.isPresent()) {
-			// TODO: Convert to millimeters
-			report.setCurrentIntensity(precipIntensity.get());
-		} else {
-			// If there is no precipIntensity, precipType will not be set
-			return;
-		}
-		Optional<String> precipType = Optional.ofNullable(currently.getPrecipType());
-		if (!precipType.isPresent()) {
-			return;
-		}
-		String type = precipType.get();
-		if ("rain".equals(type)) {
-			report.setCurrentPrecipitation(Precipitation.RAIN.toString());
-		} else if ("sleet".equals(type)) {
-			report.setCurrentPrecipitation(Precipitation.SLEET.toString());
-		} else if ("snow".equals(type)) {
-			report.setCurrentPrecipitation(Precipitation.SNOW.toString());
-		}
+		double precipIntensity = Optional.ofNullable(currently.getPrecipIntensity()).orElse(-1.0);
+		report.setCurrentIntensity(precipIntensity);
+		String precipType = Optional.ofNullable(currently.getPrecipType()).orElse("");
+		report.setCurrentPrecipitation(getPrecipitationForPrecipType(precipType).toString());
 	}
 
 	private void populateFromDaily(Optional<Daily> dailyForecast, RainReport report) {
@@ -129,33 +126,18 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 		}
 		Daily daily = dailyForecast.get();
 		List<DailyDataPoint> dailyData = daily.getData();
-		if (dailyData.isEmpty()) {
+		if (CollectionUtils.isEmpty(dailyData)) {
 			return;
 		}
-		DailyDataPoint today = dailyData.get(0);	
-		Optional<Double> precipProbability = Optional.ofNullable(today.getPrecipProbability());
-		if (precipProbability.isPresent()) {
-			report.setChanceOfPrecipitationToday(precipProbability.get());
-			if (precipProbability.get() == 0.0) {
-				report.setTypeOfPrecipitationToday(Precipitation.NONE.toString());
-				return;
-			}
-		} else {
-			// If there is no precipProbability, precipType will also not be set
+		DailyDataPoint today = dailyData.get(0);
+		double precipProbability = Optional.ofNullable(today.getPrecipProbability()).orElse(-1.0);
+		report.setChanceOfPrecipitationToday(precipProbability);
+		if (precipProbability == 0.0) {
+			report.setTypeOfPrecipitationToday(Precipitation.NONE.toString());
 			return;
 		}
-		Optional<String> precipType = Optional.ofNullable(today.getPrecipType());
-		if (!precipType.isPresent()) {
-			return;
-		}
-		String type = precipType.get();
-		if ("rain".equals(type)) {
-			report.setTypeOfPrecipitationToday(Precipitation.RAIN.toString());
-		} else if ("sleet".equals(type)) {
-			report.setTypeOfPrecipitationToday(Precipitation.SLEET.toString());
-		} else if ("snow".equals(type)) {
-			report.setTypeOfPrecipitationToday(Precipitation.SNOW.toString());
-		}
+		String precipType = Optional.ofNullable(today.getPrecipType()).orElse("");
+		report.setTypeOfPrecipitationToday(getPrecipitationForPrecipType(precipType).toString());
 	}
 
 	/**
@@ -185,10 +167,8 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 			ForecastRequest request = new ForecastRequestBuilder().key(this.apiKey).url(this.url)
 					.location(new GeoCoordinates(new Longitude(longitude), new Latitude(latitude)))
 					.exclude(Block.hourly).exclude(Block.minutely).language(Language.en).units(Units.si).build();
-			Forecast forecast = client.forecast(request);
-			if (forecast == null) {
-				throw new ForecastException("Forecast is null");
-			}
+			Forecast forecast = Optional.ofNullable(client.forecast(request))
+					.orElseThrow(() -> new ForecastException("Forecast is null"));
 			RainReport result = new RainReport();
 			result.setLatitude(latitude);
 			result.setLongitude(longitude);

@@ -29,7 +29,7 @@ public class RainReport {
 	 * @param currentAccuracy            the accuracy of the precipitation actually
 	 *                                   occurring at the current time
 	 * @param currentIntensity           the intensity of the precipitation
-	 *                                   currently occurring, in millimeters/hour
+	 *                                   currently occurring, in inches/hour
 	 * @param chanceOfPrecipitationToday the chance that there precipitation will
 	 *                                   occur at the location today
 	 * @param typeOfPrecipitationToday   the type of precipitation that is expected
