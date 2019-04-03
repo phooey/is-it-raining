@@ -285,12 +285,8 @@ public class DarkSkyWeatherProviderTest {
 	@Test
 	public void whenThereAreMoreThan1000ApiCallsInADay_thenItShouldNotMakeADarkSkyApiCallAndThrowARainReportException()
 			throws Exception {
-		RainReport dummyRainReport = new RainReport();
-		dummyRainReport.setLatitude(DUMMY_LATITUDE);
-		dummyRainReport.setLongitude(DUMMY_LONGITUDE);
-		dummyRainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
-		dummyRainReport.setChanceOfPrecipitationToday(0.5);
-
+		RainReport dummyRainReport = new RainReport(DUMMY_LATITUDE, DUMMY_LONGITUDE, Precipitation.RAIN.toString(), 0.5,
+				0.02, 1.0, Precipitation.RAIN.toString());
 		mockForecast(dummyRainReport);
 
 		for (int i = 1; i <= 999; i++) {
@@ -323,14 +319,8 @@ public class DarkSkyWeatherProviderTest {
 
 		verify(mockClient, times(999)).forecast(any());
 		reset(mockClient);
-		
-		RainReport dummyRainReport = new RainReport();
-		dummyRainReport.setLatitude(DUMMY_LATITUDE);
-		dummyRainReport.setLongitude(DUMMY_LONGITUDE);
-		dummyRainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
-		dummyRainReport.setChanceOfPrecipitationToday(0.5);
-		mockForecast(dummyRainReport);
-		
+		when(mockClient.forecast(any())).thenReturn(mockForecast);
+
 		// Make sure we don't make any new Dark Sky API requests
 		try {
 			subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
@@ -341,11 +331,9 @@ public class DarkSkyWeatherProviderTest {
 
 		// Return tomorrows date to reset the API call counter and make sure we then
 		// make new requests again
-
 		when(mockClock.millis()).thenReturn(Clock.systemUTC().millis() + DateUtils.MILLIS_PER_DAY);
 
-		RainReport result = subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
+		subject.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE);
 		verify(mockClient, times(1)).forecast(any());
-		assertThat(result).isEqualTo(dummyRainReport);
 	}
 }
