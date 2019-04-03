@@ -31,7 +31,7 @@ public class DarkSkyWeatherProviderIntegrationTest {
 	public WireMockRule wireMockRule = new WireMockRule(8089);
 
 	@Test
-	public void givenForecastWithoutRain_shouldReturnNoAndZeroChance() throws Exception {
+	public void givenForecastWithoutRain_shouldReturnMatchingRainReport() throws Exception {
 		double latitude = 48.36;
 		double longitude = 10.89;
 		TestUtils.stubResponseForDarkSkyApiRequest(
@@ -44,11 +44,14 @@ public class DarkSkyWeatherProviderIntegrationTest {
 		assertThat(result.getLatitude()).isEqualTo(latitude);
 		assertThat(result.getLongitude()).isEqualTo(longitude);
 		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.NONE.toString());
-		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(0);
+		assertThat(result.getCurrentAccuracy()).isEqualTo(0.0);
+		assertThat(result.getCurrentIntensity()).isEqualTo(0.0);
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(0);		
+		assertThat(result.getTypeOfPrecipitationToday()).isEqualTo(Precipitation.NONE.toString());
 	}
 
 	@Test
-	public void givenForecastWithRain_shouldReturnYesAndChanceOne() throws Exception {
+	public void givenForecastWithRain_shouldReturnMatchingRainReport() throws Exception {
 		double latitude = 50.76;
 		double longitude = 15.05;
 		TestUtils.stubResponseForDarkSkyApiRequest(
@@ -61,6 +64,9 @@ public class DarkSkyWeatherProviderIntegrationTest {
 		assertThat(result.getLatitude()).isEqualTo(latitude);
 		assertThat(result.getLongitude()).isEqualTo(longitude);
 		assertThat(result.getCurrentPrecipitation()).isEqualTo(Precipitation.RAIN.toString());
-		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(1);
-	}
+		assertThat(result.getCurrentAccuracy()).isEqualTo(0.01);
+		assertThat(result.getCurrentIntensity()).isEqualTo(0.0508);
+		assertThat(result.getChanceOfPrecipitationToday()).isEqualTo(1);		
+		assertThat(result.getTypeOfPrecipitationToday()).isEqualTo(Precipitation.RAIN.toString());
+		}
 }
