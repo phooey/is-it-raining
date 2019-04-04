@@ -9,25 +9,55 @@ function showError(message) {
   document.getElementById("error").innerHTML = message;
 }
 
-function formatAnswer(currentPrecipitation) {
-	if (currentPrecipitation == "rain") {
-		return "Yes";
-	} else if (currentPrecipitation == "sleet") {
-		return "Yes (sleet)";
-	} else if (currentPrecipitation == "snow") {
-		return "Yes (snow)";
-	} else if (currentPrecipitation == "none") {
-		return "No";
-	} else {
-		return "Unknown";
-	}
+function formatAnswerString(currentPrecipitation) {
+  var answer;
+  switch (currentPrecipitation) {
+    case "rain":
+      answer = "Yes";
+      break;
+    case "sleet":
+    case "snow":
+    case "none":
+      answer = "No";
+      break;
+    default:
+      answer = "Unknown";
+      break;
+  }
+  return answer;
 }
 
-function convertToPercentString(chanceOfRain) {
-	if (chanceOfRain === -1) {
-		return "unknown";
-	}
-	return Number(chanceOfRain * 100).toFixed(0).toString() + "%";
+function formatPrecipitationString(typeOfPrecipitation) {
+  var precipitation;
+  switch (typeOfPrecipitation) {
+    case "rain":
+    case "sleet":
+    case "snow":
+      precipitation = typeOfPrecipitation;
+      break;
+    case "none":
+      precipitation = "no precipitation";
+      break;
+    default:
+      precipitation = "precipitation";
+      break;
+  }
+  return precipitation;
+}
+
+function convertToPercentString(floatNumber) {
+  if (floatNumber === -1) {
+    return "unknown";
+  }
+  return Number(floatNumber * 100).toFixed(0).toString() + "%";
+}
+
+function formatIntensityString(floatNumber) {
+  if (floatNumber === -1) {
+    return "unknown";
+  }
+  // Convert from inches to millimeters
+  return Number(floatNumber * 25.4).toFixed(2).toString() + " mm/hour";
 }
 
 function retrieveRainReport(position) {
@@ -37,10 +67,10 @@ function retrieveRainReport(position) {
   xhr.open('GET', 'isitraining/?latitude=' + latitude + '&longitude=' + longitude);
   xhr.timeout = 5000;
   xhr.onerror = function (e) {
-	showError("Could not reach service: Error");
+    showError("Could not reach service: Error");
   }
   xhr.ontimeout = function (e) {
-	showError("Could not reach service: Timeout");
+    showError("Could not reach service: Timeout");
   };
   xhr.onload = function() {
     if (xhr.status === 200) {
@@ -48,8 +78,12 @@ function retrieveRainReport(position) {
       document.getElementById("rainReport").style.visibility = "visible";
       document.getElementById("latitude").innerHTML = response.latitude;
       document.getElementById("longitude").innerHTML = response.longitude;
-      document.getElementById("rainingCurrently").innerHTML = formatAnswer(response.currentPrecipitation);
-      document.getElementById("chanceOfRain").innerHTML = convertToPercentString(response.chanceOfPrecipitationToday);
+      document.getElementById("answer").innerHTML = formatAnswerString(response.currentPrecipitation);
+      document.getElementById("currentPrecipitation").innerHTML = formatPrecipitationString(response.currentPrecipitation);
+      document.getElementById("currentProbability").innerHTML = convertToPercentString(response.currentProbability);
+      document.getElementById("currentIntensity").innerHTML = formatIntensityString(response.currentIntensity);
+      document.getElementById("chanceOfPrecipitationToday").innerHTML = convertToPercentString(response.chanceOfPrecipitationToday);
+      document.getElementById("typeOfPrecipitationToday").innerHTML = formatPrecipitationString(response.typeOfPrecipitationToday);
     } else {
       showError("Could not retrieve a rain report, try again later.");
     }
@@ -60,10 +94,10 @@ function retrieveRainReport(position) {
 function getLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(retrieveRainReport, function (error) {
-    	showError("You need to share your location for this page to work.");
+      showError("You need to share your location for this page to work.");
     });
   } else {
-	showError("This page will not function without GeoLocation support.");
+    showError("This page will not function without GeoLocation support.");
   }
 }
 
@@ -92,10 +126,16 @@ body {
 <span id="error"></span>
 <table id="rainReport">
   <tr>
-    <td><h1><b><span id="rainingCurrently"></span></b></h1></td>
+    <td><h1><b><span id="answer"></span></b></h1></td>
   </tr>
   <tr>
-    <td>There is a <span id="chanceOfRain"></span> chance of rain today at location <span id="latitude"></span>, <span id="longitude"></span>.</td>
+    <td>
+    <h3>There is currently <span id="currentPrecipitation"></span> at location <span id="latitude"></span>, <span id="longitude"></span>.</h3>
+    <p><i>Probability <span id="currentProbability"></span>, Intensity <span id="currentIntensity"></span>.</i></p>
+    </td>
+  </tr>
+  <tr>
+    <td><h3>Today there is a <span id="chanceOfPrecipitationToday"></span> chance of <span id="typeOfPrecipitationToday"></span>.</h3></td>
   </tr>
 </table>
 <h3><a id="darkSkyAttribution" href="https://darksky.net/poweredby/">Powered by Dark Sky</a></h3>

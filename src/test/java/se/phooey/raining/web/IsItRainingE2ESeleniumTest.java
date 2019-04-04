@@ -96,8 +96,12 @@ public class IsItRainingE2ESeleniumTest {
 		assertThat(driver.findElement(By.id("title")).getText(), containsString("Is it raining?"));
 		assertThat(driver.findElement(By.id("latitude")).getText(), containsString(String.valueOf(expectedLatitude)));
 		assertThat(driver.findElement(By.id("longitude")).getText(), containsString(String.valueOf(expectedLongitude)));
-		assertThat(driver.findElement(By.id("rainingCurrently")).getText(), containsString("Yes"));
-		assertThat(driver.findElement(By.id("chanceOfRain")).getText(), containsString("100%"));
+		assertThat(driver.findElement(By.id("answer")).getText(), containsString("Yes"));
+		assertThat(driver.findElement(By.id("currentPrecipitation")).getText(), containsString("rain"));
+		assertThat(driver.findElement(By.id("currentProbability")).getText(), containsString("1%"));
+		assertThat(driver.findElement(By.id("currentIntensity")).getText(), containsString("1.29 mm/hour"));
+		assertThat(driver.findElement(By.id("chanceOfPrecipitationToday")).getText(), containsString("100%"));
+		assertThat(driver.findElement(By.id("typeOfPrecipitationToday")).getText(), containsString("rain"));
 	}
 
 	@Test
