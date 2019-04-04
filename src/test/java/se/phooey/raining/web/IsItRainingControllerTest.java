@@ -74,8 +74,11 @@ public class IsItRainingControllerTest {
 		RainReport dummyRainReport = new RainReport();
 		dummyRainReport.setLatitude(truncatedLatitude);
 		dummyRainReport.setLongitude(truncatedLongitude);
+		dummyRainReport.setCurrentProbability(0.1);
 		dummyRainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
+		dummyRainReport.setCurrentIntensity(0.05);
 		dummyRainReport.setChanceOfPrecipitationToday(0.5);
+		dummyRainReport.setTypeOfPrecipitationToday(Precipitation.RAIN.toString());
 		given(mockWeatherProvider.isItRainingAtCoordinates(truncatedLatitude, truncatedLongitude))
 				.willReturn(dummyRainReport);
 

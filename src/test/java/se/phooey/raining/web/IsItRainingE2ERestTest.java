@@ -53,6 +53,9 @@ public class IsItRainingE2ERestTest {
 		.body("latitude", equalTo((float) latitude)).and()
 		.body("longitude", equalTo((float) longitude)).and()
 		.body("currentPrecipitation", equalTo(Precipitation.RAIN.toString())).and()
-		.body("chanceOfPrecipitationToday", equalTo((float) 1));
+		.body("currentProbability", equalTo((float) 0.01)).and()
+		.body("currentIntensity", equalTo((float) 0.0508)).and()
+		.body("chanceOfPrecipitationToday", equalTo((float) 1)).and()
+		.body("typeOfPrecipitationToday", equalTo(Precipitation.RAIN.toString()));
 	}
 }
