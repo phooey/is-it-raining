@@ -12,7 +12,7 @@ public class RainReport {
 	private double latitude;
 	private double longitude;
 	private String currentPrecipitation;
-	private double currentAccuracy;
+	private double currentProbability;
 	private double currentIntensity;
 	private double chanceOfPrecipitationToday;
 	private String typeOfPrecipitationToday;
@@ -26,8 +26,8 @@ public class RainReport {
 	 *                                   report refers to
 	 * @param currentPrecipitation       the type of precipitation currently
 	 *                                   occurring at the location
-	 * @param currentAccuracy            the accuracy of the precipitation actually
-	 *                                   occurring at the current time
+	 * @param currentProbability         the probability of precipitation occurring
+	 *                                   at the current time
 	 * @param currentIntensity           the intensity of the precipitation
 	 *                                   currently occurring, in inches/hour
 	 * @param chanceOfPrecipitationToday the chance that there precipitation will
@@ -35,31 +35,28 @@ public class RainReport {
 	 * @param typeOfPrecipitationToday   the type of precipitation that is expected
 	 *                                   to occur today
 	 */
-	public RainReport(double latitude, double longitude, String currentPrecipitation, double currentAccuracy,
+	public RainReport(double latitude, double longitude, String currentPrecipitation, double currentProbability,
 			double currentIntensity, double chanceOfPrecipitationToday, String typeOfPrecipitationToday) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.currentPrecipitation = currentPrecipitation;
-		this.currentAccuracy = currentAccuracy;
+		this.currentProbability = currentProbability;
 		this.currentIntensity = currentIntensity;
 		this.chanceOfPrecipitationToday = chanceOfPrecipitationToday;
 		this.typeOfPrecipitationToday = typeOfPrecipitationToday;
 	}
-	
+
 	/**
-	 * Creates a new RainReport with default values;
-	 * latitude = 0, longitude = 0 (Null Island),
-	 * currentPrecipitation = "unknown",
-	 * currentAccuracy = -1,
-	 * currentIntensity = -1,
-	 * chanceOfPrecipitationToday = -1,
+	 * Creates a new RainReport with default values; latitude = 0, longitude = 0
+	 * (Null Island), currentPrecipitation = "unknown", currentProbability = -1,
+	 * currentIntensity = -1, chanceOfPrecipitationToday = -1,
 	 * typeOfPrecipitationToday = "unknown"
 	 */
 	public RainReport() {
 		this.latitude = 0;
 		this.longitude = 0;
 		this.currentPrecipitation = Precipitation.UNKNOWN.toString();
-		this.currentAccuracy = -1;
+		this.currentProbability = -1;
 		this.currentIntensity = -1;
 		this.chanceOfPrecipitationToday = -1;
 		this.typeOfPrecipitationToday = Precipitation.UNKNOWN.toString();
@@ -70,7 +67,7 @@ public class RainReport {
 		int result = 17;
 		result = 31 * result + Double.valueOf(latitude).hashCode();
 		result = 31 * result + Double.valueOf(longitude).hashCode();
-		result = 31 * result + Double.valueOf(currentAccuracy).hashCode();
+		result = 31 * result + Double.valueOf(currentProbability).hashCode();
 		result = 31 * result + Double.valueOf(currentIntensity).hashCode();
 		result = 31 * result + Double.valueOf(chanceOfPrecipitationToday).hashCode();
 		if (currentPrecipitation != null) {
@@ -97,7 +94,7 @@ public class RainReport {
 		return (other.getLatitude() == this.latitude) && (other.getLongitude() == this.longitude)
 				&& ((other.getCurrentPrecipitation() != null)
 						&& (other.getCurrentPrecipitation().equals(this.currentPrecipitation)))
-				&& (other.getCurrentAccuracy() == this.currentAccuracy)
+				&& (other.getCurrentProbability() == this.currentProbability)
 				&& (other.getCurrentIntensity() == this.currentIntensity)
 				&& ((other.getTypeOfPrecipitationToday() != null)
 						&& other.getTypeOfPrecipitationToday().equals(this.typeOfPrecipitationToday))
@@ -107,10 +104,10 @@ public class RainReport {
 	@Override
 	public String toString() {
 		return String.format(Locale.US,
-				"latitude: %f%n" + "longitude: %f%n" + "currentPrecipitation: %s%n" + "currentAccuracy: %f%n"
+				"latitude: %f%n" + "longitude: %f%n" + "currentPrecipitation: %s%n" + "currentProbability: %f%n"
 						+ "currentIntensity: %f%n" + "chanceOfPrecipitationToday: %f%n"
 						+ "typeOfPrecipitationToday: %s%n",
-				latitude, longitude, currentPrecipitation, currentAccuracy, currentIntensity,
+				latitude, longitude, currentPrecipitation, currentProbability, currentIntensity,
 				chanceOfPrecipitationToday, typeOfPrecipitationToday);
 	}
 
@@ -138,12 +135,12 @@ public class RainReport {
 		this.currentPrecipitation = currentPrecipitation;
 	}
 
-	public double getCurrentAccuracy() {
-		return currentAccuracy;
+	public double getCurrentProbability() {
+		return currentProbability;
 	}
 
-	public void setCurrentAccuracy(double currentAccuracy) {
-		this.currentAccuracy = currentAccuracy;
+	public void setCurrentProbability(double currentProbability) {
+		this.currentProbability = currentProbability;
 	}
 
 	public double getCurrentIntensity() {

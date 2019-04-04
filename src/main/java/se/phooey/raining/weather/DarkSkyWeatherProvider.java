@@ -108,7 +108,7 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 		}
 		currently = currentForecast.get();
 		double precipProbability = Optional.ofNullable(currently.getPrecipProbability()).orElse(-1.0);
-		report.setCurrentAccuracy(precipProbability);
+		report.setCurrentProbability(precipProbability);
 		if (precipProbability == 0.0) {
 			report.setCurrentIntensity(0.0);
 			report.setCurrentPrecipitation(Precipitation.NONE.toString());
