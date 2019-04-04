@@ -16,7 +16,7 @@ The development was done with the [Spring Tool Suite](https://spring.io/tools), 
 Version control was done with [Git](https://git-scm.com/), [GitHub](https://github.com/) and [EGit](https://www.eclipse.org/egit/)
 
 ## The application
-The application is called *"Is it raining?"*. It is a simple web application, and has a simple [Thymeleaf](https://www.thymeleaf.org/) front-end that uses the [HTML5 Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) to retrieve the geographic coordinates of the user. The front-end is otherwise pure HTML/CSS/JavaScript (no jQuery!) and calls a REST API on a back-end implemented with Spring Boot, with the coordinates as parameters. The REST API uses the Dark Sky API to retrieve a weather report for the location, and generates and returns JSON data with a report to state if it is raining currently at the specified location, and what the chances of rain are today.
+The application is called *"Is it raining?"*. It is a simple web application, and has a simple front-end that uses the [HTML5 Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) to retrieve the geographic coordinates of the user. The front-end is otherwise pure HTML/CSS/JavaScript (no jQuery!) and calls a REST API on a back-end implemented with Spring Boot, with the coordinates as parameters. The REST API uses the Dark Sky API to retrieve a weather report for the location, and generates and returns JSON data with a report to state if it is raining currently at the specified location, and what the chances of rain are today.
 
 The provided coordinates for the requested location are truncated to three decimal points, giving an accuracy of roughly 100 meters. A counter is implemented to make sure no more than 1000 API calls are made per day to the Dark Sky API, the maximum number of free API calls per day.
 
@@ -96,7 +96,6 @@ https://travis-ci.org/phooey/is-it-raining
 
 ## Third party software used in the application:
 * https://spring.io/projects/spring-boot
-* https://www.thymeleaf.org/
 * https://maven.apache.org/
 * https://darksky.net/dev
 * https://github.com/200Puls/darksky-forecast-api
