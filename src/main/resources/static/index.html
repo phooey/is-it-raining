@@ -12,10 +12,16 @@
 <span id="error"></span>
 <table id="rainReport">
   <tr>
-    <td><h1><b><span id="rainingCurrently"></span></b></h1></td>
+    <td><h1><b><span id="answer"></span></b></h1></td>
   </tr>
   <tr>
-    <td>There is a <span id="chanceOfRain"></span> chance of rain today at location <span id="latitude"></span>, <span id="longitude"></span>.</td>
+    <td>
+    <h3>There is currently <span id="currentPrecipitation"></span> at location <span id="latitude"></span>, <span id="longitude"></span>.</h3>
+    <p><i>Probability <span id="currentProbability"></span>, Intensity <span id="currentIntensity"></span>.</i></p>
+    </td>
+  </tr>
+  <tr>
+    <td><h3>Today there is a <span id="chanceOfPrecipitationToday"></span> chance of <span id="typeOfPrecipitationToday"></span>.</h3></td>
   </tr>
 </table>
 <h3><a id="darkSkyAttribution" href="https://darksky.net/poweredby/">Powered by Dark Sky</a></h3>

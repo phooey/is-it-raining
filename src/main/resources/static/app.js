@@ -3,11 +3,55 @@ function showError(message) {
   document.getElementById("error").innerHTML = message;
 }
 
-function convertToPercentString(chanceOfRain) {
-  if (chanceOfRain === -1) {
+function formatAnswerString(currentPrecipitation) {
+  var answer;
+  switch (currentPrecipitation) {
+    case "rain":
+      answer = "Yes";
+      break;
+    case "sleet":
+    case "snow":
+    case "none":
+      answer = "No";
+      break;
+    default:
+      answer = "Unknown";
+      break;
+  }
+  return answer;
+}
+
+function formatPrecipitationString(typeOfPrecipitation) {
+  var precipitation;
+  switch (typeOfPrecipitation) {
+    case "rain":
+    case "sleet":
+    case "snow":
+      precipitation = typeOfPrecipitation;
+      break;
+    case "none":
+      precipitation = "no precipitation";
+      break;
+    default:
+      precipitation = "precipitation";
+      break;
+  }
+  return precipitation;
+}
+
+function convertToPercentString(floatNumber) {
+  if (floatNumber === -1) {
     return "unknown";
   }
-  return Number(chanceOfRain * 100).toFixed(0).toString() + "%";
+  return Number(floatNumber * 100).toFixed(0).toString() + "%";
+}
+
+function formatIntensityString(floatNumber) {
+  if (floatNumber === -1) {
+    return "unknown";
+  }
+  // Convert from inches to millimeters
+  return Number(floatNumber * 25.4).toFixed(2).toString() + " mm/hour";
 }
 
 function retrieveRainReport(position) {
@@ -17,10 +61,10 @@ function retrieveRainReport(position) {
   xhr.open('GET', 'isitraining/?latitude=' + latitude + '&longitude=' + longitude);
   xhr.timeout = 5000;
   xhr.onerror = function (e) {
-  showError("Could not reach service: Error");
+    showError("Could not reach service: Error");
   }
   xhr.ontimeout = function (e) {
-  showError("Could not reach service: Timeout");
+    showError("Could not reach service: Timeout");
   };
   xhr.onload = function() {
     if (xhr.status === 200) {
@@ -28,8 +72,12 @@ function retrieveRainReport(position) {
       document.getElementById("rainReport").style.visibility = "visible";
       document.getElementById("latitude").innerHTML = response.latitude;
       document.getElementById("longitude").innerHTML = response.longitude;
-      document.getElementById("rainingCurrently").innerHTML = response.rainingCurrently;
-      document.getElementById("chanceOfRain").innerHTML = convertToPercentString(response.chanceOfRainToday);
+      document.getElementById("answer").innerHTML = formatAnswerString(response.currentPrecipitation);
+      document.getElementById("currentPrecipitation").innerHTML = formatPrecipitationString(response.currentPrecipitation);
+      document.getElementById("currentProbability").innerHTML = convertToPercentString(response.currentProbability);
+      document.getElementById("currentIntensity").innerHTML = formatIntensityString(response.currentIntensity);
+      document.getElementById("chanceOfPrecipitationToday").innerHTML = convertToPercentString(response.chanceOfPrecipitationToday);
+      document.getElementById("typeOfPrecipitationToday").innerHTML = formatPrecipitationString(response.typeOfPrecipitationToday);
     } else {
       showError("Could not retrieve a rain report, try again later.");
     }

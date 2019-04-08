@@ -11,6 +11,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import se.phooey.raining.weather.exception.RainReportException;
 import tk.plogitech.darksky.api.jackson.DarkSkyJacksonClient;
@@ -81,45 +82,72 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 		}
 	}
 
-	private IsItRaining isThereRainInCurrentForecast(Optional<Currently> currentForecast) {
-		Currently currently;
-		if (currentForecast.isPresent()) {
-			currently = currentForecast.get();
-		} else {
-			return IsItRaining.UNKNOWN;
+	private static Precipitation getPrecipitationForPrecipType(String precipType) {
+		Precipitation result;
+		switch (precipType) {
+		case "rain":
+			result = Precipitation.RAIN;
+			break;
+		case "sleet":
+			result = Precipitation.SLEET;
+			break;
+		case "snow":
+			result = Precipitation.SNOW;
+			break;
+		default:
+			result = Precipitation.UNKNOWN;
+			break;
 		}
-		String precipType = Optional.ofNullable(currently.getPrecipType()).orElse("");
-		if (precipType.equals("rain")) {
-			return IsItRaining.YES;
-		} else {
-			return IsItRaining.NO;
-		}
+		return result;
 	}
 
-	private double getChanceOfRainToday(Optional<Daily> dailyForecast) {
+	private void populateFromCurrently(Optional<Currently> currentForecast, RainReport report) {
+		Currently currently;
+		if (!currentForecast.isPresent()) {
+			return;
+		}
+		currently = currentForecast.get();
+		double precipProbability = Optional.ofNullable(currently.getPrecipProbability()).orElse(-1.0);
+		report.setCurrentProbability(precipProbability);
+		if (precipProbability == 0.0) {
+			report.setCurrentIntensity(0.0);
+			report.setCurrentPrecipitation(Precipitation.NONE.toString());
+			return;
+		}
+		double precipIntensity = Optional.ofNullable(currently.getPrecipIntensity()).orElse(-1.0);
+		report.setCurrentIntensity(precipIntensity);
+		String precipType = Optional.ofNullable(currently.getPrecipType()).orElse("");
+		report.setCurrentPrecipitation(getPrecipitationForPrecipType(precipType).toString());
+	}
+
+	private void populateFromDaily(Optional<Daily> dailyForecast, RainReport report) {
 		if (!dailyForecast.isPresent()) {
-			return -1;
+			return;
 		}
 		Daily daily = dailyForecast.get();
 		List<DailyDataPoint> dailyData = daily.getData();
-		if (dailyData.isEmpty()) {
-			return -1;
+		if (CollectionUtils.isEmpty(dailyData)) {
+			return;
 		}
 		DailyDataPoint today = dailyData.get(0);
-		String precipType = Optional.ofNullable(today.getPrecipType()).orElse("");
-		if (precipType.equals("rain")) {
-			return today.getPrecipProbability();
-		} else {
-			return 0;
+		double precipProbability = Optional.ofNullable(today.getPrecipProbability()).orElse(-1.0);
+		report.setChanceOfPrecipitationToday(precipProbability);
+		if (precipProbability == 0.0) {
+			report.setTypeOfPrecipitationToday(Precipitation.NONE.toString());
+			return;
 		}
+		String precipType = Optional.ofNullable(today.getPrecipType()).orElse("");
+		report.setTypeOfPrecipitationToday(getPrecipitationForPrecipType(precipType).toString());
 	}
 
 	/**
 	 * Creates a new DarkSkyWeatherProvider
+	 * 
 	 * @param apiKey the API key to use when making requests to the Dark Sky API
 	 * @param apiUrl the URL to use when making Dark Sky API requests
 	 * @param client The DarkSkyJacksonClient to use to make Dark Sky API requests
-	 * @param clock A Clock to use to determine the time when counting API calls made in a day
+	 * @param clock  A Clock to use to determine the time when counting API calls
+	 *               made in a day
 	 */
 	@Autowired
 	public DarkSkyWeatherProvider(APIKey apiKey, String apiUrl, DarkSkyJacksonClient client, Clock clock) {
@@ -139,13 +167,14 @@ public class DarkSkyWeatherProvider implements WeatherProvider {
 			ForecastRequest request = new ForecastRequestBuilder().key(this.apiKey).url(this.url)
 					.location(new GeoCoordinates(new Longitude(longitude), new Latitude(latitude)))
 					.exclude(Block.hourly).exclude(Block.minutely).language(Language.en).units(Units.si).build();
-			Forecast forecast = client.forecast(request);
-			if (forecast == null) {
-				throw new ForecastException("Forecast is null");
-			}
-			IsItRaining rainingCurrently = isThereRainInCurrentForecast(Optional.ofNullable(forecast.getCurrently()));
-			double chanceOfRainToday = getChanceOfRainToday(Optional.ofNullable(forecast.getDaily()));
-			return new RainReport(latitude, longitude, rainingCurrently.toString(), chanceOfRainToday);
+			Forecast forecast = Optional.ofNullable(client.forecast(request))
+					.orElseThrow(() -> new ForecastException("Forecast is null"));
+			RainReport result = new RainReport();
+			result.setLatitude(latitude);
+			result.setLongitude(longitude);
+			populateFromCurrently(Optional.ofNullable(forecast.getCurrently()), result);
+			populateFromDaily(Optional.ofNullable(forecast.getDaily()), result);
+			return result;
 		} catch (IllegalArgumentException | ForecastException e) {
 			logger.error(e.getMessage());
 			throw new RainReportException(String.format(Locale.US,
