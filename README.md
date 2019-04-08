@@ -56,7 +56,7 @@ The first test then spoofs an HTML5 Geolocation response and request a rain repo
 The second test makes sure that an attribution link for the Dark Sky API is displayed on the page, in accordance with the [Terms of Service](https://darksky.net/dev/docs/terms) for the Dark Sky API.
 
 ## Building and running the application:
-First get your own API Key from [Dark Sky](https://darksky.net/dev), then paste your key into the file "src/main/resources/darksky.apikey.properties.example" and rename the file to "darksky.apikey.properties".
+First get your own API Key from [Dark Sky](https://darksky.net/dev), then paste your key into the file `src/main/resources/darksky.apikey.properties.example` and rename the file to `darksky.apikey.properties`.
 
 To run the tests execute the following command:
 `mvn test`
@@ -69,15 +69,15 @@ The built jar file is then available in the "target" subdirectory and can be exe
 
 The application is then by default listening to HTTP connections on port 8080.
 
-You can also use [Docker](https://www.docker.com/) and the provided Dockerfile to run the application inside a docker container after building the jar file with Maven.
+You can also use [Docker](https://www.docker.com/) and the provided `Dockerfile` to run the application inside a docker container after building the jar file with Maven.
 
 Please note that for HTML5 geolocation to work in some browsers (e.g. Chrome 50.0+) you need to serve the application over https instead of http. This can be achieved by e.g. running the application behind a reverse proxy.
 
-An example script "start_container.sh" is provided to show how this could be done, starting a docker container and connecting it to a network called "letsencrypt_default" where a reverse proxy is set up to forward the calls the docker container, encrypting the external communication. To set up a reverse proxy like this, take a look at [linuxserver/letsencrypt
+An example script `start_container.sh` is provided to show how this could be done, starting a docker container and connecting it to a network called "letsencrypt_default" where a reverse proxy is set up to forward the calls the docker container, encrypting the external communication. To set up a reverse proxy like this, take a look at [linuxserver/letsencrypt
 ](https://hub.docker.com/r/linuxserver/letsencrypt/).
 
 ## Continuous Integration
-There is a simple .travisyml file in the project, and the code is automatically built, and all tests executed by [Travis](https://travis-ci.com) on all new commits and pull requests, as the service is very generously freely provided to all public open source GitHub projects.
+There is a simple `.travisyml` file in the project, and the code is automatically built, and all tests executed by [Travis](https://travis-ci.com) on all new commits and pull requests, as the service is very generously freely provided to all public open source GitHub projects.
 
 The build results are displayed with the build status image at the top of this README, and can also be viewed on the following page:
 https://travis-ci.org/phooey/is-it-raining
@@ -94,6 +94,7 @@ https://travis-ci.org/phooey/is-it-raining
 * https://git-scm.com/
 * https://github.com/
 * https://www.eclipse.org/egit/
+* https://www.eclemma.org/
 * https://travis-ci.com
 
 ## Third party software used in the application:
