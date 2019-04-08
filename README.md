@@ -22,6 +22,8 @@ The provided coordinates for the requested location are truncated to three decim
 
 The application is obviously simple enough that it could be a pure front-end application, directly consuming and parsing the weather API. But since we use an API that requires a private API key, and for the purpose of putting the testing in focus, this is instead done in a back-end.
 
+The front-end includes a ["Fork me on GitHub" ribbon](https://github.com/simonwhitaker/github-fork-ribbon-css), that links to the GitHub repository of this application. It is based on pure CSS, and therefore loads a stylesheet for it from a CDN. If the stylesheets fails to load it will be displayed as a normal link.
+
 ## The testing
 The application was implemented in a test-driven way, and the idea is to have a as complete automated test-coverage as possible, while testing all functionality on as low a level in the test pyramid as possible.
 
@@ -107,6 +109,7 @@ https://travis-ci.org/phooey/is-it-raining
 * https://www.seleniumhq.org/
 * https://github.com/bonigarcia/webdrivermanager
 * https://www.mozilla.org/en-US/firefox/
+* https://github.com/simonwhitaker/github-fork-ribbon-css
 
 ## Licenses:
 For licenses of the used third party software, please refer to the links given above. For the license of this application, see the LICENSE file and/or any respective source files. For a guaranteed up-to-date list of third party software used, refer to the projects pom.xml file.
