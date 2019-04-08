@@ -113,4 +113,4 @@ https://travis-ci.org/phooey/is-it-raining
 * https://github.com/simonwhitaker/github-fork-ribbon-css
 
 ## Licenses:
-For licenses of the used third party software, please refer to the links given above. For the license of this application, see the LICENSE file and/or any respective source files. For a guaranteed up-to-date list of third party software used, refer to the projects pom.xml file.
+For licenses of the used third party software, please refer to the links given above. For the license of this application, see the `LICENSE` file and/or any respective source files. For a guaranteed up-to-date list of third party software used, refer to the projects `pom.xml` file.
