@@ -1,3 +1,5 @@
+// These are unit tests for the front-end JavaScript in src/main/resources/static/app.js
+
 describe("The app.js function", function() {
   
   describe("showError", function() {

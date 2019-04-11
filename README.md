@@ -28,9 +28,11 @@ The front-end includes a ["Fork me on GitHub" ribbon](https://github.com/simonwh
 The application was implemented in a test-driven way, and the idea is to have a as complete automated test-coverage as possible, while testing all functionality on as low a level in the test pyramid as possible.
 
 ### Unit tests
-The base of the tests are unit tests, based on [JUnit](https://junit.org), and where applicable SpringBootTest and the SpringRunner. Mocking external dependencies in the unit tests are done using [Mockito](https://site.mockito.org/).
+The base of the tests are unit tests. For the back-end they are based on [JUnit](https://junit.org), and where applicable SpringBootTest and the SpringRunner. Mocking external dependencies in the unit tests are done using [Mockito](https://site.mockito.org/).
 
 All logic that can be tested with unit tests, e.g. the parsing of the weather data from the Dark Sky API, and the logic in the Spring Boot Controllers are tested with these tests.
+
+The same goes for the front-end, where the unit-tests for the `app.js` file are written using [Jasmine](https://jasmine.github.io/) and executed with maven through the [Jasmin Maven Plugin](https://searls.github.io/jasmine-maven-plugin/).
 
 ### Service/Integration tests
 
@@ -55,9 +57,7 @@ The first test then spoofs an HTML5 Geolocation response and request a rain repo
 
 The second test makes sure that an attribution link for the Dark Sky API is displayed on the page, in accordance with the [Terms of Service](https://darksky.net/dev/docs/terms) for the Dark Sky API.
 
-Further tests of the JavaScript logic and error-handling in the front-end should not be done with Selenium tests, but with JavaScript unit tests (just like for the Java back-end code) to follow the test pyramid mind-set. That's why we only test a positive scenario here.
-
-To add these JavaScript unittests are a further improvement, and could be done using e.g. the [jasmine-maven-plugin](https://searls.github.io/jasmine-maven-plugin/).
+Further tests of the JavaScript logic and error-handling in the front-end are not done with Selenium tests, since it is already covered by the JavaScript unit tests (just like for the Java back-end code), to follow the test pyramid mind-set. That's why we only test a positive scenario here.
 
 ## Building and running the application:
 First get your own API Key from [Dark Sky](https://darksky.net/dev), then paste your key into the file `src/main/resources/darksky.apikey.properties.example` and rename the file to `darksky.apikey.properties`.
@@ -115,6 +115,8 @@ https://travis-ci.org/phooey/is-it-raining
 * https://github.com/bonigarcia/webdrivermanager
 * https://www.mozilla.org/en-US/firefox/
 * https://github.com/simonwhitaker/github-fork-ribbon-css
+* https://jasmine.github.io/
+* https://searls.github.io/jasmine-maven-plugin/
 
 ## Licenses:
 For licenses of the used third party software, please refer to the links given above. For the license of this application, see the `LICENSE` file and/or any respective source files. For a guaranteed up-to-date list of third party software used, refer to the projects `pom.xml` file.
