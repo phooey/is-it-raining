@@ -1,6 +1,6 @@
 package se.phooey.raining.web;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
@@ -29,14 +29,14 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import se.phooey.raining.utils.TestUtils;
 
 /**
- * Full-Stack End-to-End tests using Selenium to make sure that the front-end of
+ * Full-Stack End-to-End test using Selenium to make sure that the front-end of
  * the application is served at route "/", and is working correctly integrating
  * with the back-end.
  * 
  * The back-end is already fully tested, so we focus on testing the front-end
- * here. The front-end is really simple, but has some error-handling which
- * should arguably be tested. But due to simplicity and the long execution time
- * of these tests we do only a positive test scenario here.
+ * here. The front-end JavaScript code is also already tested with unit tests.
+ * So due to the the long execution time of these tests we do only a positive 
+ * test scenario here.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -66,7 +66,8 @@ public class IsItRainingE2ESeleniumTest {
 		profile.setPreference("geo.prompt.testing.allow", true);
 		final String fileName = "spoofed_geolocation.json";
 		URL fileUrl = getClass().getClassLoader().getResource(fileName);
-		profile.setPreference("geo.wifi.uri", Objects.requireNonNull(fileUrl, String.format("Cannot find file %s", fileName)).toExternalForm());
+		profile.setPreference("geo.wifi.uri",
+				Objects.requireNonNull(fileUrl, String.format("Cannot find file %s", fileName)).toExternalForm());
 		options.setProfile(profile);
 		options.setHeadless(true);
 		driver = new FirefoxDriver(options);
@@ -79,7 +80,7 @@ public class IsItRainingE2ESeleniumTest {
 	}
 
 	@Test
-	public void pageWithSpoofedGeolocationIncludesCoordinatesAndDummyRainReport()
+	public void pageWithSpoofedGeolocationIncludesCoordinatesAndDummyRainReportWithDarkSkyAttributionText()
 			throws InterruptedException, IOException {
 		double expectedLatitude = 13.37;
 		double expectedLongitude = 90.01;
@@ -93,27 +94,26 @@ public class IsItRainingE2ESeleniumTest {
 		wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("latitude"),
 				String.valueOf(expectedLatitude)));
 
-		assertThat(driver.findElement(By.id("title")).getText(), containsString("Is it raining?"));
-		assertThat(driver.findElement(By.id("latitude")).getText(), containsString(String.valueOf(expectedLatitude)));
-		assertThat(driver.findElement(By.id("longitude")).getText(), containsString(String.valueOf(expectedLongitude)));
-		assertThat(driver.findElement(By.id("answer")).getText(), containsString("Yes"));
-		assertThat(driver.findElement(By.id("currentPrecipitation")).getText(), containsString("rain"));
-		assertThat(driver.findElement(By.id("currentProbability")).getText(), containsString("1%"));
-		assertThat(driver.findElement(By.id("currentIntensity")).getText(), containsString("1.29 mm/hour"));
-		assertThat(driver.findElement(By.id("chanceOfPrecipitationToday")).getText(), containsString("100%"));
-		assertThat(driver.findElement(By.id("typeOfPrecipitationToday")).getText(), containsString("rain"));
-	}
+		// Check that some main style elements are correct
+		assertThat(driver.getTitle(), equalTo("Is it raining?"));
+		assertThat(driver.findElement(By.id("title")).getText(), equalTo("Is it raining?"));
+		assertThat(driver.findElement(By.id("rainReport")).getCssValue("visibility"), equalTo("visible"));
+		
+		// Check that all values from the RainReport are set
+		assertThat(driver.findElement(By.id("latitude")).getText(), equalTo(String.valueOf(expectedLatitude)));
+		assertThat(driver.findElement(By.id("longitude")).getText(), equalTo(String.valueOf(expectedLongitude)));
+		assertThat(driver.findElement(By.id("answer")).getText(), equalTo("Yes"));
+		assertThat(driver.findElement(By.id("currentPrecipitation")).getText(), equalTo("rain"));
+		assertThat(driver.findElement(By.id("currentProbability")).getText(), equalTo("1%"));
+		assertThat(driver.findElement(By.id("currentIntensity")).getText(), equalTo("1.29 mm/hour"));
+		assertThat(driver.findElement(By.id("chanceOfPrecipitationToday")).getText(), equalTo("100%"));
+		assertThat(driver.findElement(By.id("typeOfPrecipitationToday")).getText(), equalTo("rain"));
 
-	@Test
-	public void pageIncludesAttributionLinkToDarkSky() {
+		// Check that the attribution link for Dark Sky is visible according to the terms of service
 		final String attributionText = "Powered by Dark Sky";
 		final String attributionLink = "https://darksky.net/poweredby/";
 
-		driver.get(url);
-
-		assertThat(driver.findElement(By.tagName("body")).getText(), containsString(attributionText));
-		assertThat(driver.findElement(By.id("darkSkyAttribution")).getText(), containsString(attributionText));
-		assertThat(driver.findElement(By.id("darkSkyAttribution")).getAttribute("href"),
-				containsString(attributionLink));
+		assertThat(driver.findElement(By.id("darkSkyAttribution")).getText(), equalTo(attributionText));
+		assertThat(driver.findElement(By.id("darkSkyAttribution")).getAttribute("href"), equalTo(attributionLink));
 	}
 }

@@ -50,12 +50,12 @@ To finally see that the application is working as expected in End-To-End use cas
 #### REST API End-to-End test
 There is one test for the provided REST API endpoint using SpringBootTest to actually spin up the web server, and use [REST Assured](http://rest-assured.io/) to send a real HTTP GET request to it. WireMock is then used to stub out a real response from the Dark Sky API, to be able to assert that the JSON data representing the rain report is generated correctly. This test is there to make sure that a running instance of the application actually responds to HTTP requests as expected, and this is the first time we actually completely spin up our back-end.
 
-#### GUI End-to-End tests
-There are two GUI driven End-to-End tests to make sure the application is working as expected when operated through it's front-end. They use SpringBootTest to spin up the whole application, [Selenium](http://rest-assured.io/) and [WebDriverManager](https://github.com/bonigarcia/webdrivermanager) to open a [Firefox](https://www.mozilla.org/en-US/firefox/) web driver that loads the front-end. The tests use Firefox in headless mode, and therefore require a Firefox version with headless support to be installed.
+#### GUI End-to-End test
+There is one GUI driven End-to-End test to make sure the application is working as expected when operated through it's front-end. They use SpringBootTest to spin up the whole application, [Selenium](http://rest-assured.io/) and [WebDriverManager](https://github.com/bonigarcia/webdrivermanager) to open a [Firefox](https://www.mozilla.org/en-US/firefox/) web driver that loads the front-end. The tests use Firefox in headless mode, and therefore require a Firefox version with headless support to be installed.
 
-The first test then spoofs an HTML5 Geolocation response and request a rain report for the spoofed location from the back-end (also stubbed out using WireMock), and asserts that the resulting information displayed in the front-end is as expected. This test can be considered an End-to-End acceptance test.
+The test spoofs an HTML5 Geolocation response and request a rain report for the spoofed location from the back-end (also stubbed out using WireMock), and asserts that the resulting information displayed in the front-end is as expected. This test can be considered an End-to-End acceptance test.
 
-The second test makes sure that an attribution link for the Dark Sky API is displayed on the page, in accordance with the [Terms of Service](https://darksky.net/dev/docs/terms) for the Dark Sky API.
+It also makes sure that an attribution link for the Dark Sky API is displayed on the page, in accordance with the [Terms of Service](https://darksky.net/dev/docs/terms) for the Dark Sky API.
 
 Further tests of the JavaScript logic and error-handling in the front-end are not done with Selenium tests, since it is already covered by the JavaScript unit tests (just like for the Java back-end code), to follow the test pyramid mind-set. That's why we only test a positive scenario here.
 
