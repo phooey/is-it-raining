@@ -1,4 +1,5 @@
 function showError(message) {
+  console.log(message);
   document.getElementById("error").style.visibility = "visible";
   document.getElementById("error").innerHTML = message;
 }
@@ -40,18 +41,30 @@ function formatPrecipitationString(typeOfPrecipitation) {
 }
 
 function convertToPercentString(floatNumber) {
-  if (floatNumber === -1) {
+  if (isNaN(floatNumber) || floatNumber === -1) {
     return "unknown";
   }
   return Number(floatNumber * 100).toFixed(0).toString() + "%";
 }
 
-function formatIntensityString(floatNumber) {
-  if (floatNumber === -1) {
+function formatIntensityString(inchesPerHour) {
+  if (isNaN(inchesPerHour) || inchesPerHour === -1.0) {
     return "unknown";
   }
   // Convert from inches to millimeters
-  return Number(floatNumber * 25.4).toFixed(2).toString() + " mm/hour";
+  return Number(inchesPerHour * 25.4).toFixed(2).toString() + " mm/hour";
+}
+
+function displayRainReport(rainReport) {
+  document.getElementById("rainReport").style.visibility = "visible";
+  document.getElementById("latitude").innerHTML = rainReport.latitude;
+  document.getElementById("longitude").innerHTML = rainReport.longitude;
+  document.getElementById("answer").innerHTML = formatAnswerString(rainReport.currentPrecipitation);
+  document.getElementById("currentPrecipitation").innerHTML = formatPrecipitationString(rainReport.currentPrecipitation);
+  document.getElementById("currentProbability").innerHTML = convertToPercentString(rainReport.currentProbability);
+  document.getElementById("currentIntensity").innerHTML = formatIntensityString(rainReport.currentIntensity);
+  document.getElementById("chanceOfPrecipitationToday").innerHTML = convertToPercentString(rainReport.chanceOfPrecipitationToday);
+  document.getElementById("typeOfPrecipitationToday").innerHTML = formatPrecipitationString(rainReport.typeOfPrecipitationToday);
 }
 
 function retrieveRainReport(position) {
@@ -60,28 +73,19 @@ function retrieveRainReport(position) {
   var xhr = new XMLHttpRequest();
   xhr.open('GET', 'isitraining/?latitude=' + latitude + '&longitude=' + longitude);
   xhr.timeout = 5000;
-  xhr.onerror = function (e) {
+  xhr.addEventListener("error", function (e) {
     showError("Could not reach service: Error");
-  }
-  xhr.ontimeout = function (e) {
+  });
+  xhr.addEventListener("timeout", function (e) {
     showError("Could not reach service: Timeout");
-  };
-  xhr.onload = function() {
+  });
+  xhr.addEventListener("load",  function() {
     if (xhr.status === 200) {
-      var response = JSON.parse(xhr.responseText);
-      document.getElementById("rainReport").style.visibility = "visible";
-      document.getElementById("latitude").innerHTML = response.latitude;
-      document.getElementById("longitude").innerHTML = response.longitude;
-      document.getElementById("answer").innerHTML = formatAnswerString(response.currentPrecipitation);
-      document.getElementById("currentPrecipitation").innerHTML = formatPrecipitationString(response.currentPrecipitation);
-      document.getElementById("currentProbability").innerHTML = convertToPercentString(response.currentProbability);
-      document.getElementById("currentIntensity").innerHTML = formatIntensityString(response.currentIntensity);
-      document.getElementById("chanceOfPrecipitationToday").innerHTML = convertToPercentString(response.chanceOfPrecipitationToday);
-      document.getElementById("typeOfPrecipitationToday").innerHTML = formatPrecipitationString(response.typeOfPrecipitationToday);
+      displayRainReport(JSON.parse(xhr.responseText));
     } else {
       showError("Could not retrieve a rain report, try again later.");
     }
-  };
+  });
   xhr.send();
 }
 
@@ -94,5 +98,3 @@ function getLocation() {
     showError("This page will not function without GeoLocation support.");
   }
 }
-
-window.onload = getLocation();
