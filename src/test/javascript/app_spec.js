@@ -138,6 +138,8 @@ describe("The app.js function", function() {
       expect(longitudeDiv.innerHTML).toEqual('13.37');
       expect(latitudeDiv.innerHTML).toEqual('90.01');
     });
+
+    // TODO: Add tests for all the other values in the rainReport
   });
 
   describe("retrieveRainReport", function() {
@@ -226,9 +228,22 @@ describe("The app.js function", function() {
   });
 
   describe("getLocation", function() {
+    beforeAll(function () {
+      // Override window.navigator.geolocation as it is not supported by PhantomJS
+      const dummyGeoLocation = {
+        getCurrentPosition: function (success, failure) { }
+      };
+
+      window.navigator = {
+        get geolocation() { return dummyGeoLocation; }
+      };
+
+    });
+
     it("should call showError if 'navigator.geolocation' is not defined", function () {
       // Given
-      spyOnProperty(navigator, "geolocation", "get").and.returnValue(undefined);
+      var navigator = {};
+      spyOnProperty(window.navigator, "geolocation", "get").and.returnValue(undefined);
       spyOn(window, "showError").and.stub();
 
       // When
