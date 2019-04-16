@@ -105,7 +105,7 @@ describe("The app.js function", function() {
 
     it("should set the visibility of the rainReport table to visible", function () {
       // Given
-      var element = document.createElement('table');
+      var element = document.createElement("table");
       element.setAttribute("style", "visibility: hidden");
       element.setAttribute("id", "rainReport");
       spyOn(document, "getElementById").and.returnValue(element);
@@ -114,14 +114,14 @@ describe("The app.js function", function() {
       displayRainReport(dummyRainReport);
 
       // Then
-      expect(element.getAttribute("style")).toEqual('visibility: visible;');
+      expect(element.getAttribute("style")).toEqual("visibility: visible;");
     });
 
     it("should set the coordinate values in the longitude and latitude divs", function () {
       // Given
-      var longitudeDiv = document.createElement('div');
+      var longitudeDiv = document.createElement("div");
       longitudeDiv.setAttribute("id", "longitude");
-      var latitudeDiv = document.createElement('div');
+      var latitudeDiv = document.createElement("div");
       latitudeDiv.setAttribute("id", "latitude");
       spyOn(document, "getElementById").and.callFake(function(element) {
         if (element === "latitude"){
@@ -129,7 +129,7 @@ describe("The app.js function", function() {
         } else if (element === "longitude") {
             return longitudeDiv;
         } else {
-          return document.createElement('div');
+          return document.createElement("div");
         }
       });
 
@@ -137,11 +137,60 @@ describe("The app.js function", function() {
       displayRainReport(dummyRainReport);
 
       // Then
-      expect(longitudeDiv.innerHTML).toEqual('13.37');
-      expect(latitudeDiv.innerHTML).toEqual('90.01');
+      expect(longitudeDiv.innerHTML).toEqual("13.37");
+      expect(latitudeDiv.innerHTML).toEqual("90.01");
     });
 
-    // TODO: Add tests for all the other values in the rainReport
+    it("should set the the 'answer' div to 'Yes'", function () {
+      // Given
+      var answerDiv = document.createElement("div");
+      answerDiv.setAttribute("id", "answer");
+      spyOn(document, "getElementById").and.callFake(function(element) {
+        if (element === "answer"){
+            return answerDiv;
+        } else {
+          return document.createElement("div");
+        }
+      });
+
+      // When
+      displayRainReport(dummyRainReport);
+
+      // Then
+      expect(answerDiv.innerHTML).toEqual("Yes");
+    });
+
+    it("should set the corresponding values from the rainReport in the corresponding divs", function () {
+      // Given
+      var divs = {};
+      divs["currentPrecipitation"] = document.createElement("currentPrecipitation");
+      divs["currentPrecipitation"].setAttribute("id", "currentPrecipitation");
+      divs["currentIntensity"] = document.createElement("currentIntensity");
+      divs["currentIntensity"].setAttribute("id", "currentIntensity");
+      divs["currentProbability"] = document.createElement("currentProbability");
+      divs["currentProbability"].setAttribute("id", "currentProbability");
+      divs["chanceOfPrecipitationToday"] = document.createElement("chanceOfPrecipitationToday");
+      divs["chanceOfPrecipitationToday"].setAttribute("id", "chanceOfPrecipitationToday");
+      divs["typeOfPrecipitationToday"] = document.createElement("typeOfPrecipitationToday");
+      divs["typeOfPrecipitationToday"].setAttribute("id", "typeOfPrecipitationToday");
+      spyOn(document, "getElementById").and.callFake(function(element) {
+        if (divs[element]){
+          return divs[element];
+        } else {
+          return document.createElement("div");
+        }
+      });
+
+      // When
+      displayRainReport(dummyRainReport);
+
+      // Then
+      expect(divs["currentPrecipitation"].innerHTML).toEqual("rain");
+      expect(divs["currentIntensity"].innerHTML).toEqual("12.70 mm/hour");
+      expect(divs["currentProbability"].innerHTML).toEqual("75%");
+      expect(divs["chanceOfPrecipitationToday"].innerHTML).toEqual("100%");
+      expect(divs["typeOfPrecipitationToday"].innerHTML).toEqual("rain")
+    });
   });
 
   describe("retrieveRainReport", function() {
@@ -225,7 +274,7 @@ describe("The app.js function", function() {
 
     // TODO:
     // A further test should be written to test that displayRainReport is called from the "load" callback when the
-    // XMLHttpRequest has status 200. This is difficult with pure Jasmine, as it doesn't support mcocking properties
+    // XMLHttpRequest has status 200. This is difficult with pure Jasmine, as it doesn't support mocking properties
     // on Spy objects, and would require something like this: https://github.com/jasmine/jasmine-ajax
   });
 
@@ -244,7 +293,6 @@ describe("The app.js function", function() {
 
     it("should call showError if 'navigator.geolocation' is not defined", function () {
       // Given
-      var navigator = {};
       spyOnProperty(window.navigator, "geolocation", "get").and.returnValue(undefined);
       spyOn(window, "showError").and.stub();
 
