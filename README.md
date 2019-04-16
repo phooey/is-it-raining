@@ -83,6 +83,8 @@ An example script `start_container.sh` is provided to show how this could be don
 ## Continuous Integration
 There is a simple `.travisyml` file in the project, and the code is automatically built, and all tests executed by [Travis](https://travis-ci.com) on all new commits and pull requests, as the service is very generously freely provided to all public open source GitHub projects.
 
+All tests are executed by Travis using maven and the various plugins. The JaCoCo plugin is also enforcing a 100% line coverage for the Java tests. Please note that a 100% line coverage is not a good measure of the quality of the tests, but for a small project like this it is a reasonable requirement. Some Java classes that contain no logic are excluded from this requirement.
+
 The build results are displayed with the build status image at the top of this README, and can also be viewed on the following page:
 https://travis-ci.org/phooey/is-it-raining
 
