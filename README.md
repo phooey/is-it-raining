@@ -1,5 +1,5 @@
 # Is it raining?
-[![Build Status](https://travis-ci.org/phooey/is-it-raining.svg?branch=master)](https://travis-ci.org/phooey/is-it-raining)
+[![Build Status](https://travis-ci.org/phooey/is-it-raining.svg?branch=master)](https://travis-ci.org/phooey/is-it-raining) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=phooey-github-is-it-raining&metric=alert_status)](https://sonarcloud.io/dashboard?id=phooey-github-is-it-raining)
 
 ## The test pyramid
 After reading some very interesting articles on how to efficiently work with test automation, specifically about the so called ["Test Pyramid"](https://martinfowler.com/bliki/TestPyramid.html), I wanted to try the techniques out myself in a practical example project.
@@ -88,6 +88,9 @@ All tests are executed by Travis using maven and the various plugins. The JaCoCo
 The build results are displayed with the build status image at the top of this README, and can also be viewed on the following page:
 https://travis-ci.org/phooey/is-it-raining
 
+The project is also analyzed by [SonarCloud](https://sonarcloud.io) and the analysis result can also be seen in the status image at the top of this README, and on the following page: https://sonarcloud.io/dashboard?id=phooey-github-is-it-raining
+
+
 ## Links:
 * https://martinfowler.com/bliki/TestPyramid.html
 * https://martinfowler.com/articles/practical-test-pyramid.html
@@ -103,6 +106,7 @@ https://travis-ci.org/phooey/is-it-raining
 * https://www.eclemma.org/
 * https://www.eclemma.org/jacoco/trunk/doc/maven.html
 * https://travis-ci.com
+* https://sonarcloud.io
 
 ## Third party software used in the application:
 * https://spring.io/projects/spring-boot
