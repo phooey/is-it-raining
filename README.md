@@ -11,7 +11,7 @@ The project is also based on [Spring Boot](https://spring.io/projects/spring-boo
 
 Instead of implementing my own client to consume the Dark Sky API, I used the [darksky-forecast-api](https://github.com/200Puls/darksky-forecast-api) available in the [Maven](https://maven.apache.org/) Central Repository.
 
-The development was done with the [Spring Tool Suite](https://spring.io/tools), based on [Eclipse](https://www.eclipse.org/) with the [SonarLint](https://www.sonarlint.org/) extension for static code analysis. The [EclEmma](https://www.eclemma.org/) plugin for Eclipse was used to analyze the code coverage of the tests.
+The development was done with the [Spring Tool Suite](https://spring.io/tools), based on [Eclipse](https://www.eclipse.org/) with the [SonarLint](https://www.sonarlint.org/) extension for static code analysis. The [EclEmma](https://www.eclemma.org/) plugin for Eclipse, and [JaCoCo Maven plug-in](https://www.eclemma.org/jacoco/trunk/doc/maven.html) is used to analyze the code coverage of the tests.
 
 Version control was done with [Git](https://git-scm.com/), [GitHub](https://github.com/) and [EGit](https://www.eclipse.org/egit/)
 
@@ -99,6 +99,7 @@ https://travis-ci.org/phooey/is-it-raining
 * https://github.com/
 * https://www.eclipse.org/egit/
 * https://www.eclemma.org/
+* https://www.eclemma.org/jacoco/trunk/doc/maven.html
 * https://travis-ci.com
 
 ## Third party software used in the application:
