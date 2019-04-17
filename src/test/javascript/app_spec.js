@@ -1,21 +1,21 @@
 // These are unit tests for the front-end JavaScript in src/main/resources/static/app.js
 
 describe("The app.js function", function() {
-  
+
   describe("showError", function() {
     it("should display an error message in the 'error' div and make it visible", function () {
       // Given
-      var element = document.createElement('div');
+      var element = document.createElement("div");
       element.setAttribute("style", "visibility: hidden");
       element.setAttribute("id", "error");
       spyOn(document, "getElementById").and.returnValue(element);
       var message = "error message";
-      
+
       // When
       showError(message);
-      
+
       // Then
-      expect(element.getAttribute("style")).toEqual('visibility: visible;');
+      expect(element.getAttribute("style")).toEqual("visibility: visible;");
       expect(element.innerHTML).toEqual(message);
     });
   });
@@ -195,13 +195,21 @@ describe("The app.js function", function() {
 
   describe("retrieveRainReport", function() {
 
-    var eventListener;
+    var xhr;
     var position;
 
     beforeEach(function() {
-      eventListener = spyOn(XMLHttpRequest.prototype, "addEventListener").and.stub();
-      spyOn(XMLHttpRequest.prototype, "open").and.stub();
-      spyOn(XMLHttpRequest.prototype, "send").and.stub();
+      xhr = {
+          open: jasmine.createSpy('open'),
+          load: jasmine.createSpy('load'),
+          send: jasmine.createSpy('send'),
+          addEventListener: jasmine.createSpy('addEventListener'),
+          get status() {},
+          get responseText() {}
+      };
+      window.XMLHttpRequest = jasmine.createSpy('XMLHttpRequest').and.callFake(function () {
+          return xhr;
+      });
 
       position = { coords: { latitude: 13.37, longitude: 90.01 }};
     });
@@ -213,14 +221,14 @@ describe("The app.js function", function() {
       retrieveRainReport(position);
 
       // Then
-      expect(XMLHttpRequest.prototype.open.calls.count()).toEqual(1);
-      expect(XMLHttpRequest.prototype.open.calls.argsFor(0)).toEqual(['GET', 'isitraining/?latitude=13.37&longitude=90.01']);
-      expect(XMLHttpRequest.prototype.send.calls.count()).toEqual(1);
+      expect(xhr.open.calls.count()).toEqual(1);
+      expect(xhr.open.calls.argsFor(0)).toEqual(['GET', 'isitraining/?latitude=13.37&longitude=90.01']);
+      expect(xhr.send.calls.count()).toEqual(1);
     });
 
     it("should register a callback for the error event and show an error when it is called", function () {
       // Given
-      eventListener.and.callFake(function(event) {
+      xhr.addEventListener.and.callFake(function(event) {
         if (event === "error") {
           arguments[1]("error");
         }
@@ -230,15 +238,15 @@ describe("The app.js function", function() {
       // When
       retrieveRainReport(position);
 
-      // Then      
-      expect(XMLHttpRequest.prototype.addEventListener).toHaveBeenCalledWith("error", jasmine.any(Function));
+      // Then
+      expect(xhr.addEventListener).toHaveBeenCalledWith("error", jasmine.any(Function));
       expect(window.showError.calls.count()).toEqual(1);
       expect(window.showError.calls.argsFor(0)).toEqual(["Could not reach service: Error"]);
     });
 
     it("should register a callback for the timeout event and show an error when it is called", function () {
       // Given
-      eventListener.and.callFake(function(event) {
+      xhr.addEventListener.and.callFake(function(event) {
         if (event === "timeout") {
           arguments[1]("error");
         }
@@ -248,34 +256,55 @@ describe("The app.js function", function() {
       // When
       retrieveRainReport(position);
 
-      // Then      
-      expect(XMLHttpRequest.prototype.addEventListener).toHaveBeenCalledWith("timeout", jasmine.any(Function));
+      // Then
+      expect(xhr.addEventListener).toHaveBeenCalledWith("timeout", jasmine.any(Function));
       expect(window.showError.calls.count()).toEqual(1);
       expect(window.showError.calls.argsFor(0)).toEqual(["Could not reach service: Timeout"]);
     });
 
     it("should register a callback for the load event and show an error when it is called and the status of the XMLHttpRequest is not 200 OK", function () {
       // Given
-      eventListener.and.callFake(function(event) {
+      spyOn(window, "showError").and.stub();
+
+      spyOnProperty(xhr, "status", "get").and.returnValue(500);
+      xhr.addEventListener.and.callFake(function(event) {
         if (event === "load") {
           arguments[1]();
         }
       });
-      spyOn(window, "showError").and.stub();
 
       // When
       retrieveRainReport(position);
 
-      // Then      
-      expect(XMLHttpRequest.prototype.addEventListener).toHaveBeenCalledWith("load", jasmine.any(Function));
+      // Then
+      expect(xhr.addEventListener).toHaveBeenCalledWith("load", jasmine.any(Function));
       expect(window.showError.calls.count()).toEqual(1);
       expect(window.showError.calls.argsFor(0)).toEqual(["Could not retrieve a rain report, try again later."]);
     });
 
-    // TODO:
-    // A further test should be written to test that displayRainReport is called from the "load" callback when the
-    // XMLHttpRequest has status 200. This is difficult with pure Jasmine, as it doesn't support mocking properties
-    // on Spy objects, and would require something like this: https://github.com/jasmine/jasmine-ajax
+    it("should register a callback for the load event and call displayRainReport with the responseText when the status of the XMLHttpRequest is 200 OK", function () {
+      // Given
+      spyOn(window, "displayRainReport").and.stub();
+
+      xhr.addEventListener.and.callFake(function(event) {
+        if (event === "load") {
+          arguments[1]();
+        }
+      });
+      spyOnProperty(xhr, "status", "get").and.returnValue(200);
+      const dummyJsonData = { "dummy": "data" };
+      spyOnProperty(xhr, "responseText", "get").and.returnValue(JSON.stringify(dummyJsonData));
+
+      // When
+      retrieveRainReport(position);
+
+      // Then
+      expect(xhr.addEventListener).toHaveBeenCalledWith("load", jasmine.any(Function));
+      expect(window.displayRainReport.calls.count()).toEqual(1);
+      expect(window.displayRainReport.calls.argsFor(0)[0]).toEqual(dummyJsonData);
+
+    });
+
   });
 
   describe("getLocation", function() {
@@ -307,11 +336,11 @@ describe("The app.js function", function() {
     it("should register retrieveRainReport as callback for getCurrentPosition", function () {
       // Given
       spyOn(navigator.geolocation,"getCurrentPosition").and.stub();
-      
+
       // When
       getLocation();
 
-      // Then     
+      // Then
       expect(navigator.geolocation.getCurrentPosition.calls.count()).toEqual(1);
       expect(navigator.geolocation.getCurrentPosition.calls.argsFor(0)[0]).toEqual(window.retrieveRainReport);
     });
