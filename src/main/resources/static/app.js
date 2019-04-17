@@ -1,6 +1,6 @@
 function showError(message) {
   console.log(message);
-  document.getElementById("error").style.visibility = "visible";
+  document.getElementById("error").style.display = "inline";
   document.getElementById("error").innerHTML = message;
 }
 
@@ -48,7 +48,7 @@ function convertToPercentString(floatNumber) {
 }
 
 function formatIntensityString(inchesPerHour) {
-  if (isNaN(inchesPerHour) || inchesPerHour === -1.0) {
+  if (isNaN(inchesPerHour) || inchesPerHour === -1) {
     return "unknown";
   }
   // Convert from inches to millimeters
@@ -56,7 +56,7 @@ function formatIntensityString(inchesPerHour) {
 }
 
 function displayRainReport(rainReport) {
-  document.getElementById("rainReport").style.visibility = "visible";
+  document.getElementById("rainReport").style.display = "inline";
   document.getElementById("latitude").innerHTML = rainReport.latitude;
   document.getElementById("longitude").innerHTML = rainReport.longitude;
   document.getElementById("answer").innerHTML = formatAnswerString(rainReport.currentPrecipitation);
@@ -64,7 +64,7 @@ function displayRainReport(rainReport) {
   document.getElementById("currentProbability").innerHTML = convertToPercentString(rainReport.currentProbability);
   document.getElementById("currentIntensity").innerHTML = formatIntensityString(rainReport.currentIntensity);
   document.getElementById("chanceOfPrecipitationToday").innerHTML = convertToPercentString(rainReport.chanceOfPrecipitationToday);
-  document.getElementById("typeOfPrecipitationToday").innerHTML = formatPrecipitationString(rainReport.typeOfPrecipitationToday);
+  document.getElementById("typeOfPrecipitationToday").innerHTML = formatPrecipitationString(rainReport.typeOfPrecipitationToday).replace("no ", "");
 }
 
 function retrieveRainReport(position) {

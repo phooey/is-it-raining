@@ -6,7 +6,7 @@ describe("The app.js function", function() {
     it("should display an error message in the 'error' div and make it visible", function () {
       // Given
       var element = document.createElement("div");
-      element.setAttribute("style", "visibility: hidden");
+      element.setAttribute("style", "display: none");
       element.setAttribute("id", "error");
       spyOn(document, "getElementById").and.returnValue(element);
       var message = "error message";
@@ -15,7 +15,7 @@ describe("The app.js function", function() {
       showError(message);
 
       // Then
-      expect(element.getAttribute("style")).toEqual("visibility: visible;");
+      expect(element.getAttribute("style")).toEqual("display: inline;");
       expect(element.innerHTML).toEqual(message);
     });
   });
@@ -103,10 +103,10 @@ describe("The app.js function", function() {
       typeOfPrecipitationToday: "rain"
     };
 
-    it("should set the visibility of the rainReport table to visible", function () {
+    it("should make the rainReport table visible", function () {
       // Given
       var element = document.createElement("table");
-      element.setAttribute("style", "visibility: hidden");
+      element.setAttribute("style", "display: none");
       element.setAttribute("id", "rainReport");
       spyOn(document, "getElementById").and.returnValue(element);
 
@@ -114,7 +114,7 @@ describe("The app.js function", function() {
       displayRainReport(dummyRainReport);
 
       // Then
-      expect(element.getAttribute("style")).toEqual("visibility: visible;");
+      expect(element.getAttribute("style")).toEqual("display: inline;");
     });
 
     it("should set the coordinate values in the longitude and latitude divs", function () {

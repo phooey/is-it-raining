@@ -6,9 +6,9 @@ body {
   font-family: Arial, sans-serif;
 }
 #error {
-  visibility: hidden;
+  display: none;
 }
 
 #rainReport {
-  visibility: hidden;
+  display: none;
 }
