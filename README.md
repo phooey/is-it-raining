@@ -80,6 +80,41 @@ Please note that for HTML5 geolocation to work in some browsers (e.g. Chrome 50.
 An example script `start_container.sh` is provided to show how this could be done, starting a docker container and connecting it to a network called "letsencrypt_default" where a reverse proxy is set up to forward the calls the docker container, encrypting the external communication. To set up a reverse proxy like this, take a look at [linuxserver/letsencrypt
 ](https://hub.docker.com/r/linuxserver/letsencrypt/).
 
+## Setting up the project in an IDE
+The Project is based on Maven, and it should be possible to import it with any Integrated Development Environment (IDE) that supports Git, Java and Maven.
+
+Here follows a short guide on how to set it up with the free and open source Eclipse-based IDE Spring Tool Suite (STS), but the process should be similar for other IDE:s as well:
+
+### Setting up the project with STS
+1.	Download and install STS, i.e. "Spring Tools 4 for Eclipse" from https://spring.io/tools
+2.	Launch STS (the guide is written for version 4 of STS)
+3.	Under the “File” menu, select “Import”
+4.	Under the “Maven” folder, select “Check out Maven projects from SCM” and click “Next”
+5.	Click the “Clone or download”-button at the top of this GitHub page and copy the URL, then paste it into the “SCM URL” input field in the STS.
+6.	Click “Finish” and the git project should be cloned from GitHub into a local copy in your STS workspace
+
+### Running the Java JUnit-based tests in STS
+1.	Right-click the project in the “Project Explorer” view (it should be called “is-it-raining”)
+2.	Select “Run As” -> “JUnit Test”
+3.	This will execute all JUnit-based tests and show the results in the IDE
+
+### Running the JavaScript unit tests from STS
+1.	Right-click the project in the “Project Explorer” view
+2.	Select “Run As” -> “Maven build…”
+3.	In the “Goals” input field enter `jasmine:test`
+4.	Click the “Run” button, and the JavaScript unit tests will be executed by Maven and the results shown in the console
+
+### Running the application locally with STS 
+1.	First get a Dark Sky API key from https://darksky.net/dev
+2.	To configure your Dark Sky API key in STS follow these steps:
+  1. In the “Project Explorer” open the project and navigate to the “src/main/resources” folder
+  2. Right-click the file `darksky.apikey.properties.example` and select “Rename”
+  3. Enter `darksky.apikey.properties` as the new name and click “OK”
+  4. Open the file `darksky.apikey.properties` by double clicking it
+  5. Enter your Dark Sky API key after the equal sign on the line `darksky.api.key=inserthere`
+3.	Then you can launch the application by right-clicking the project and selecting “Run as” -> “Spring Boot App”
+4.	When the application is running, you can access it using a web browser, by default on the following address: `http://localhost:8080`
+
 ## Continuous Integration
 There is a simple `.travisyml` file in the project, and the code is automatically built, and all tests executed by [Travis](https://travis-ci.com) on all new commits and pull requests, as the service is very generously freely provided to all public open source GitHub projects.
 
