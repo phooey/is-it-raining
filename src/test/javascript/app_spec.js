@@ -8,7 +8,11 @@ describe("The app.js function", function() {
       var element = document.createElement("div");
       element.setAttribute("style", "display: none");
       element.setAttribute("id", "error");
-      spyOn(document, "getElementById").and.returnValue(element);
+      spyOn(document, "getElementById").and.callFake(function(id) {
+        if (id === "error") {
+          return element;
+        }
+      });
       var message = "error message";
 
       // When
@@ -108,7 +112,13 @@ describe("The app.js function", function() {
       var element = document.createElement("table");
       element.setAttribute("style", "display: none");
       element.setAttribute("id", "rainReport");
-      spyOn(document, "getElementById").and.returnValue(element);
+      spyOn(document, "getElementById").and.callFake(function(id) {
+        if (id === "rainReport") {
+          return element;
+        } else {
+          return document.createElement(id);
+        }
+      });
 
       // When
       displayRainReport(dummyRainReport);
