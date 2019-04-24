@@ -72,8 +72,11 @@ public class IsItRainingControllerAPITest {
 		RainReport rainReport = new RainReport();
 		rainReport.setLatitude(DUMMY_LATITUDE);
 		rainReport.setLongitude(DUMMY_LONGITUDE);
+		rainReport.setCurrentProbability(0.1);
 		rainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
+		rainReport.setCurrentIntensity(0.05);
 		rainReport.setChanceOfPrecipitationToday(0.5);
+		rainReport.setTypeOfPrecipitationToday(Precipitation.RAIN.toString());
 		
 		given(weatherProviderMock.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE)).willReturn(rainReport);
 
@@ -85,7 +88,10 @@ public class IsItRainingControllerAPITest {
 				.andExpect(jsonPath("$.latitude").value(DUMMY_LATITUDE))
 				.andExpect(jsonPath("$.longitude").value(DUMMY_LONGITUDE))
 				.andExpect(jsonPath("$.currentPrecipitation").value(Precipitation.RAIN.toString()))
-				.andExpect(jsonPath("$.chanceOfPrecipitationToday").value(0.5));
+				.andExpect(jsonPath("$.currentProbability").value(0.1))
+				.andExpect(jsonPath("$.currentIntensity").value(0.05))
+				.andExpect(jsonPath("$.chanceOfPrecipitationToday").value(0.5))
+				.andExpect(jsonPath("$.typeOfPrecipitationToday").value(Precipitation.RAIN.toString()));
 	}
 
 }
