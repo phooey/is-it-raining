@@ -1,6 +1,8 @@
 package se.phooey.raining.web;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 
 import se.phooey.raining.weather.Precipitation;
 import se.phooey.raining.weather.RainReport;
@@ -38,9 +41,6 @@ public class IsItRainingControllerAPITest {
 	@MockBean
 	private WeatherProvider weatherProviderMock;
 
-	private static final double DUMMY_LATITUDE = 13.37;
-	private static final double DUMMY_LONGITUDE = 90.01;
-
 	@Test
 	public void whenGetIsItRainingWithoutParams_shouldRespondBadRequest() throws Exception {
 		this.mockMvc.perform(get("/isitraining")).andExpect(status().is4xxClientError());
@@ -58,17 +58,21 @@ public class IsItRainingControllerAPITest {
 	@Test
 	public void whenGetIsItRainingCausesTheWeatherProviderToThrowARainReportException_shouldRespondBadRequest()
 			throws Exception {
-		given(weatherProviderMock.isItRainingAtCoordinates(DUMMY_LATITUDE, DUMMY_LONGITUDE))
+		final double dummyLatitude = 13.37;
+		final double dummyLongitude = 90.01;
+		given(weatherProviderMock.isItRainingAtCoordinates(dummyLatitude, dummyLongitude))
 				.willThrow(RainReportException.class);
 		this.mockMvc.perform(
 				get("/isitraining")
-				.param("latitude", String.valueOf(DUMMY_LATITUDE))
-				.param("longitude", String.valueOf(DUMMY_LONGITUDE)))
+				.param("latitude", String.valueOf(dummyLatitude))
+				.param("longitude", String.valueOf(dummyLongitude)))
 				.andExpect(status().is5xxServerError());
 	}
 
 	@Test
 	public void whenGetIsItRainingWithValidParams_shouldReturnARainReportForTheLocation() throws Exception {
+		final double DUMMY_LATITUDE = 12.34;
+		final double DUMMY_LONGITUDE = 56.78;
 		RainReport rainReport = new RainReport();
 		rainReport.setLatitude(DUMMY_LATITUDE);
 		rainReport.setLongitude(DUMMY_LONGITUDE);
@@ -86,6 +90,28 @@ public class IsItRainingControllerAPITest {
 				.andExpect(jsonPath("$.longitude").value(DUMMY_LONGITUDE))
 				.andExpect(jsonPath("$.currentPrecipitation").value(Precipitation.RAIN.toString()))
 				.andExpect(jsonPath("$.chanceOfPrecipitationToday").value(0.5));
+	}
+	
+	@Test
+	public void whenGetIsItRainingWithTheSameCoordinatesTwice_shouldReturnTheSameCachedRainReport() throws Exception {
+		final double latitude = 11.11;
+		final double longitude = 22.22;
+		
+		RainReport rainReport = new RainReport();
+		rainReport.setLatitude(latitude);
+		rainReport.setLongitude(longitude);
+		rainReport.setCurrentPrecipitation(Precipitation.RAIN.toString());
+		rainReport.setChanceOfPrecipitationToday(0.5);
+		
+		given(weatherProviderMock.isItRainingAtCoordinates(latitude, longitude)).willReturn(rainReport);
+
+		RequestBuilder request = get("/isitraining")
+				.param("latitude", String.valueOf(latitude))
+				.param("longitude", String.valueOf(longitude));
+		this.mockMvc.perform(request);
+		this.mockMvc.perform(request);
+		
+		verify(weatherProviderMock, times(1)).isItRainingAtCoordinates(latitude, longitude);
 	}
 
 }

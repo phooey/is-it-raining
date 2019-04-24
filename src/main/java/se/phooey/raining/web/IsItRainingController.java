@@ -5,6 +5,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +56,7 @@ public class IsItRainingController {
 	 * @throws RainReportException If a RainReport could not be generated
 	 */
 	@GetMapping("/isitraining")
+	@Cacheable("rainReportCache")
 	public RainReport isItRaining(@RequestParam(value = "latitude") double latitude,
 			@RequestParam(value = "longitude") double longitude) throws InvalidCoordinatesException, RainReportException {
 		validateCoordinates(latitude, longitude);
