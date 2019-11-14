@@ -24,5 +24,8 @@
 /.nb-gradle/
 /build/
 
+### Visual Studio Code ###
+.vscode/
+
 ### Properties file including API key for Dark Sky ###
 /is-it-raining/src/main/resources/darksky.apikey.properties
