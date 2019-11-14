@@ -6,4 +6,4 @@ addons:
   sonarcloud:
     organization: "phooey-github"
 script:
-  - mvn clean install sonar:sonar
+  - ./mvnw clean install sonar:sonar

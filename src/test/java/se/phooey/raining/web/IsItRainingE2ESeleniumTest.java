@@ -19,9 +19,13 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
@@ -53,6 +57,8 @@ public class IsItRainingE2ESeleniumTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
+		// Disable excessive logging
+		((Logger) LoggerFactory.getLogger("org.apache.http")).setLevel(Level.WARN);
 		WebDriverManager.firefoxdriver().setup();
 	}
 
