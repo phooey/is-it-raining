@@ -19,6 +19,9 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 
 import se.phooey.raining.weather.exception.RainReportException;
 import tk.plogitech.darksky.api.jackson.DarkSkyJacksonClient;
@@ -285,6 +288,7 @@ public class DarkSkyWeatherProviderTest {
 	@Test
 	public void whenThereAreMoreThan1000ApiCallsInADay_thenItShouldNotMakeADarkSkyApiCallAndThrowARainReportException()
 			throws Exception {
+		((Logger) LoggerFactory.getLogger(DarkSkyWeatherProvider.class)).setLevel(Level.ERROR);
 		RainReport dummyRainReport = new RainReport(DUMMY_LATITUDE, DUMMY_LONGITUDE, Precipitation.RAIN.toString(), 0.5,
 				0.02, 1.0, Precipitation.RAIN.toString());
 		mockForecast(dummyRainReport);
