@@ -1,7 +1,7 @@
 package se.phooey.raining.web;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.net.URL;
@@ -72,6 +72,8 @@ public class IsItRainingE2ESeleniumTest {
 		profile.setPreference("geo.prompt.testing.allow", true);
 		final String fileName = "spoofed_geolocation.json";
 		URL fileUrl = getClass().getClassLoader().getResource(fileName);
+		profile.setPreference("geo.provider.network.url",
+				Objects.requireNonNull(fileUrl, String.format("Cannot find file %s", fileName)).toExternalForm());
 		profile.setPreference("geo.wifi.uri",
 				Objects.requireNonNull(fileUrl, String.format("Cannot find file %s", fileName)).toExternalForm());
 		options.setProfile(profile);

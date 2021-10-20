@@ -1,7 +1,5 @@
 package se.phooey.raining.web;
 
-import javax.validation.ConstraintViolationException;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +15,7 @@ import se.phooey.raining.web.exception.InvalidCoordinatesException;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
  
-    @ExceptionHandler({ConstraintViolationException.class, InvalidCoordinatesException.class})
+    @ExceptionHandler({InvalidCoordinatesException.class})
     public ResponseEntity<Object> handleBadRequest(
       Exception ex, WebRequest request) {
         return handleExceptionInternal(ex, ex.getLocalizedMessage(), 
