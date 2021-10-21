@@ -1,5 +1,5 @@
 # Is it raining?
-[![Build Status](https://travis-ci.org/phooey/is-it-raining.svg?branch=master)](https://travis-ci.org/phooey/is-it-raining) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=se.phooey%3Ais-it-raining&metric=alert_status)](https://sonarcloud.io/dashboard?id=se.phooey%3Ais-it-raining)
+[![Build Status](https://app.travis-ci.com/phooey/is-it-raining.svg?branch=master)](https://app.travis-ci.com/github/phooey/is-it-raining) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=se.phooey%3Ais-it-raining&metric=alert_status)](https://sonarcloud.io/dashboard?id=se.phooey%3Ais-it-raining)
 
 ## The test pyramid
 After reading some very interesting articles on how to efficiently work with test automation, specifically about the so called ["Test Pyramid"](https://martinfowler.com/bliki/TestPyramid.html), I wanted to try the techniques out myself in a practical example project.
